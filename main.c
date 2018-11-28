@@ -2,7 +2,6 @@
 #include "stm32f0xx_ll_gpio.h"
 #include "stm32f0xx_ll_rcc.h"
 #include "stm32f0xx_ll_system.h"
-#include "stm32f0xx_it.h"
 #include "fsm.h"
 
 /**
