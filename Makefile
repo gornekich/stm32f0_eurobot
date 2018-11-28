@@ -2,7 +2,7 @@
 # Makefile for STM32F0 Discovery board projects
 
 OUTPATH = build
-PROJECT = $(OUTPATH)/control
+PROJECT = $(OUTPATH)/stmdriver
 OPENOCD_SCRIPT_DIR ?= /usr/share/openocd/scripts
 HEAP_SIZE = 0x400
 
@@ -10,7 +10,7 @@ HEAP_SIZE = 0x400
 # Sources
 
 SOURCES_S = core/startup_stm32f051x8.s
-SOURCES_C = $(wildcard *.c core/*.c plib/*cc lib/*.c)
+SOURCES_C = $(wildcard *.c core/*.c plib/*.c lib/*.c)
 SOURCES = $(SOURCES_S) $(SOURCES_C)
 OBJS = $(SOURCES_S:.s=.o) $(SOURCES_C:.c=.o)
 
@@ -18,6 +18,7 @@ OBJS = $(SOURCES_S:.s=.o) $(SOURCES_C:.c=.o)
 
 INCLUDES += -I core
 INCLUDES += -I plib
+INCLUDES += -I lib
 
 DEFINES = -DSTM32 -DSTM32F0 -DSTM32F051x8 -DHEAP_SIZE=$(HEAP_SIZE)
 
@@ -55,7 +56,11 @@ LDFLAGS = -static $(MCUFLAGS) -Wl,--start-group -lgcc -lc -lg -Wl,--end-group\
 
 .PHONY: all clean flash erase examples
 
-all: $(PROJECT).bin $(PROJECT).asm
+all: dirs $(PROJECT).bin $(PROJECT).asm
+dirs: ${OUTPATH}
+
+${OUTPATH}:
+	mkdir -p ${OUTPATH}
 
 clean:
 	$(RM) $(OBJS) $(PROJECT).elf $(PROJECT).bin $(PROJECT).asm \
