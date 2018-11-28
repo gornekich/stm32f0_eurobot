@@ -2,6 +2,7 @@
 #include "stm32f0xx_ll_gpio.h"
 #include "stm32f0xx_ll_rcc.h"
 #include "stm32f0xx_ll_system.h"
+#include "stm32f0xx_it.h"
 #include "fsm.h"
 
 /**
@@ -41,7 +42,7 @@ static void rcc_config(void)
         LL_RCC_SetAPB1Prescaler(LL_RCC_APB1_DIV_1);
 
         /* Set systick to 1ms */
-        //SysTick_Config(48000000/1000);
+        SysTick_Config(48000000/1000);
 
         /* Update CMSIS variable (which can be updated also
          * through SystemCoreClockUpdate function) */
