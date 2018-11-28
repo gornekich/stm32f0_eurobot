@@ -1,0 +1,7 @@
+FSM_STATE_DEF(DUMMY,             dummy)
+FSM_STATE_DEF(ERROR,             error)
+FSM_STATE_DEF(GLOBAL_INIT,       global_init)
+//FSM_STATE_DEF(UART_INIT,         uart_init)
+//FSM_STATE_DEF(UART_MAIN,         uart_main)
+//FSM_STATE_DEF(TERM_INIT,         term_init)
+FSM_STATE_DEF(TERM_MAIN,         term_main)
