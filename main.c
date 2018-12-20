@@ -3,6 +3,8 @@
 #include "stm32f0xx_ll_rcc.h"
 #include "stm32f0xx_ll_system.h"
 #include "fsm.h"
+#include "dynamixel.h"
+#include "terminal.h"
 
 /**
   * System Clock Configuration
@@ -77,11 +79,14 @@ void fsm_error(void *args)
 int main(void)
 {
         rcc_config();
-        fsm_init();
-
+        //fsm_init();
+        uint8_t args[2];
+        fsm_term_init((void*) &args);
+        fsm_dynamixel_init((void*) &args);
         while (1) {
-                fsm_run_state();
-                fsm_state_mng();
+                fsm_term_main((void*) &args);
+                //fsm_run_state();
+                //fsm_state_mng();
         }
         return 0;
 }

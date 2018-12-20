@@ -159,6 +159,12 @@ int fsm_set_state(uint32_t state)
         return -1;
 }
 
+void fsm_set_data(uint32_t state, void *state_data)
+{
+        fsm_ctrl.data[state] = state_data;
+        return;
+}
+
 void *fsm_get_data(uint32_t state)
 {
         if (IS_STATE_ILL(state))
