@@ -8,6 +8,8 @@
 #include "stm32f0xx_ll_usart.h"
 #include "stm32f0xx_ll_dma.h"
 
+#include <string.h>
+
 /*
  * Private control structure
  */
@@ -109,11 +111,30 @@ void comm_send_msg(uint8_t *buff, int len)
 void fsm_term_main(void *args)
 {
         (void) args;
+        uint8_t command_code = 0x00;
+        uint8_t params[TERM_CMD_LENGTH - 1];
 
         if (is_term_flag_set(term_ctrl, RX_COMPLETE)) {
-                comm_send_msg(term_ctrl.channel, 10);
                 term_clr_flag(term_ctrl, RX_COMPLETE);
+                command_code = term_ctrl.channel[0];
+                if (IS_COMMAND_VALID(command_code) &&
+                    fsm_states_handlers[command_code] != NULL) {
+                        memcpy(params, &term_ctrl.channel[1], 
+                               TERM_CMD_LENGTH - 1);
+                        fsm_set_data(command_code + FSM_TERM_CMD_START,
+                                     (void *)params);
+                        fsm_set_state(command_code + FSM_TERM_CMD_START);
+                    }
         }
+        return;
+}
+
+/*
+ * Implementation of term_handlers_start function
+ */
+void fsm_term_cmd_start(void *args)
+{
+        (void) args;
 
         return;
 }

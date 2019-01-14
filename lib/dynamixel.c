@@ -153,7 +153,7 @@ void fsm_dynamixel_init(void *args)
 /*
  * Terminal comands implementation
  */
-void fsm_set_angle(void *args)
+void fsm_dyn_set_angle(void *args)
 {
         dyn_set_angle_t *cmd_args = (dyn_set_angle_t *) args;
         if (cmd_args->angle > 0x3fff)
