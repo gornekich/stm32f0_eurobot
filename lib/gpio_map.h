@@ -5,7 +5,8 @@
 #include "stm32f0xx_ll_gpio.h"
 
 /*
- * Communication with stm UART1 pinout
+ * Communication with stm
+ * UART1 pinout
  */
 #define TERM_USART_TX_PORT                  GPIOA
 #define TERM_USART_TX_PIN                   LL_GPIO_PIN_2
@@ -14,7 +15,11 @@
 #define TERM_USART_PIN_AF                   LL_GPIO_AF_1
 
 /*
- * Communication with dynamixel 
+ * Communication with dynamixel
+ * UART2 onewire pinout
  */
+#define DYNAMIXEL_USART_PORT                GPIOA
+#define DYNAMIXEL_USART_PIN                 LL_GPIO_PIN_9
+#define DYNAMIXEL_USART_PIN_AF              LL_GPIO_AF_1
 
 #endif //_GPIO_MAP_H
