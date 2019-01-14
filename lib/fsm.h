@@ -32,7 +32,10 @@ void fsm_##state_handler(void *args);
 #define IS_STATE_ILL(state) \
         ((state <= LOWER_BOUND_CASE) || state >= UPPER_BOUND_CASE)
 
-//extern void (* const fsm_state_handlers[])(void *);
+/*
+ * Extern the array of handlers
+ */
+extern void (* const fsm_states_handlers[])(void *);
 
 typedef struct {
         uint32_t state;
@@ -74,6 +77,11 @@ int fsm_add_shadow_state(uint32_t shadow_state);
  *       If you do so the function ends up with error -1
  */
 int fsm_set_state(uint32_t state);
+
+/*
+ * The function sets data of the state specified
+ */
+void fsm_set_data(uint32_t state, void *state_data);
 
 /*
  * The function returns data of the state specified

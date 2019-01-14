@@ -96,16 +96,18 @@ void fsm_state_mng(void)
          */
         if (fsm_ctrl.shadow_state[0] == LOWER_BOUND_CASE)
                 return;
-        if (fsm_ctrl.sleep_state == LOWER_BOUND_CASE)
+        if (fsm_ctrl.sleep_state == LOWER_BOUND_CASE) {
                 fsm_ctrl.sleep_state = fsm_ctrl.shadow_state[0];
                 fast_swap(&(fsm_ctrl.sleep_state), &(fsm_ctrl.state));
                 return;
+        }
         /*
          * When current state is not shadow just swap
          */
-        if ((next_shadow = is_state_shadow(&fsm_ctrl, fsm_ctrl.state)) == -1)
+        if ((next_shadow = is_state_shadow(&fsm_ctrl, fsm_ctrl.state)) == -1) {
                 fast_swap(&(fsm_ctrl.sleep_state), &(fsm_ctrl.state));
                 return;
+        }
         /*
          * When current state is shadow take next shadow task and swap
          */
@@ -157,6 +159,12 @@ int fsm_set_state(uint32_t state)
                 return 0;
         }
         return -1;
+}
+
+void fsm_set_data(uint32_t state, void *state_data)
+{
+        fsm_ctrl.data[state] = state_data;
+        return;
 }
 
 void *fsm_get_data(uint32_t state)
