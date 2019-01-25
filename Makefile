@@ -2,7 +2,7 @@
 # Makefile for STM32F0 Discovery board projects
 
 OUTPATH = build
-PROJECT = $(OUTPATH)/stmdriver
+PROJECT = $(OUTPATH)/blank
 OPENOCD_SCRIPT_DIR ?= /usr/share/openocd/scripts
 HEAP_SIZE = 0x400
 
@@ -10,15 +10,27 @@ HEAP_SIZE = 0x400
 # Sources
 
 SOURCES_S = core/startup_stm32f051x8.s
-SOURCES_C = $(wildcard *.c core/*.c plib/*.c lib/*.c)
+
+SOURCES_CORE = $(wildcard core/*.c)
+SOURCES_PERIPH = $(wildcard plib/*.c)
+SOURCES_LIB = $(wildcard lib/*.c)
+
+SOURCES_C = $(wildcard *.c)
+SOURCES_C += $(SOURCES_CORE)
+SOURCES_C += $(SOURCES_PERIPH)
+SOURCES_C += $(SOURCES_LIB)
+
 SOURCES = $(SOURCES_S) $(SOURCES_C)
 OBJS = $(SOURCES_S:.s=.o) $(SOURCES_C:.c=.o)
 
 # Includes and Defines
 
-INCLUDES += -I core
-INCLUDES += -I plib
-INCLUDES += -I lib
+INC_CORE = -Icore
+INC_LIB = -Ilib
+INC_PERIPH = -Iplib
+INCLUDES += $(INC_CORE)
+INCLUDES += $(INC_LIB)
+INCLUDES += $(INC_PERIPH)
 
 DEFINES = -DSTM32 -DSTM32F0 -DSTM32F051x8 -DHEAP_SIZE=$(HEAP_SIZE)
 
@@ -41,54 +53,32 @@ OPENOCD=openocd
 
 # Compiler options
 
-MCUFLAGS = -mcpu=cortex-m0 -mlittle-endian -mfloat-abi=soft -mthumb
+MCUFLAGS = -mcpu=cortex-m0 -mlittle-endian -mfloat-abi=soft -mthumb \
+	   -mno-unaligned-access
 
-DEBUG_OPTIMIZE_FLAGS = -O0 -ggdb
+DEBUG_OPTIMIZE_FLAGS = -O0 -ggdb -gdwarf-2
 
-CFLAGS = -Wall -Wextra #--pedantic
-CFLAGS_EXTRA = -nostartfiles -nodefaultlibs -nostdlib\
+CFLAGS = -Wall -Wextra --pedantic
+CFLAGS_EXTRA = -nostartfiles -nodefaultlibs -nostdlib \
 	       -fdata-sections -ffunction-sections
 
 CFLAGS += $(DEFINES) $(MCUFLAGS) $(DEBUG_OPTIMIZE_FLAGS) $(CFLAGS_EXTRA) $(INCLUDES)
 
 LDFLAGS = -static $(MCUFLAGS) -Wl,--start-group -lgcc -lc -lg -Wl,--end-group\
-	  -Wl,--gc-sections -T STM32F051R8Tx_FLASH.ld
+	  -Wl,--gc-sections -T core/stm32f051r8tx_mmap.ld
 
-.PHONY: all clean flash erase examples
+.PHONY: dirs all clean flash erase
 
 all: dirs $(PROJECT).bin $(PROJECT).asm
+
 dirs: ${OUTPATH}
 
 ${OUTPATH}:
 	mkdir -p ${OUTPATH}
 
 clean:
-	$(RM) $(OBJS) $(PROJECT).elf $(PROJECT).bin $(PROJECT).asm \
-	$(EXAMPLES:=.bin) $(EXAMPLES:=.elf) ./examples/*.o ./src/*.o
-
-# Examples
-
-examples: $(EXAMPLES:=.bin)
-
-exti.elf: ./examples/exti.o $(EX_OBJS)
-	$(LD) $^ $(LDFLAGS) -o $@
-	$(SIZE) -A $@
-
-usart.elf: ./examples/usart.o $(EX_OBJS)
-	$(LD) $^ $(LDFLAGS) -o $@
-	$(SIZE) -A $@
-
-adc2dma.elf: ./examples/adc2dma.o $(EX_OBJS)
-	$(LD) $^ $(LDFLAGS) -o $@
-	$(SIZE) -A $@
-
-printf.elf: ./examples/printf.o ./src/xprintf.o $(EX_OBJS)
-	$(LD) $^ $(LDFLAGS) -o $@
-	$(SIZE) -A $@
-
-spi.elf: ./examples/spi.o $(EX_OBJS)
-	$(LD) $^ $(LDFLAGS) -o $@
-	$(SIZE) -A $@
+	$(RM) $(OBJS) $(PROJECT).elf $(PROJECT).bin $(PROJECT).asm
+	rm -rf ${OUTPATH}
 
 # Hardware specific
 
