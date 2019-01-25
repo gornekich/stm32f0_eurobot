@@ -14,11 +14,13 @@ SOURCES_S = core/startup_stm32f051x8.s
 SOURCES_CORE = $(wildcard core/*.c)
 SOURCES_PERIPH = $(wildcard plib/*.c)
 SOURCES_LIB = $(wildcard lib/*.c)
+SOURCES_SENSOR = $(wildcard lib/vl53l0x/*.c)
 
 SOURCES_C = $(wildcard *.c)
 SOURCES_C += $(SOURCES_CORE)
 SOURCES_C += $(SOURCES_PERIPH)
 SOURCES_C += $(SOURCES_LIB)
+SOURCES_C += $(SOURCES_SENSOR)
 
 SOURCES = $(SOURCES_S) $(SOURCES_C)
 OBJS = $(SOURCES_S:.s=.o) $(SOURCES_C:.c=.o)
@@ -28,9 +30,11 @@ OBJS = $(SOURCES_S:.s=.o) $(SOURCES_C:.c=.o)
 INC_CORE = -Icore
 INC_LIB = -Ilib
 INC_PERIPH = -Iplib
+INC_SENSOR = -Ilib/vl53l0x
 INCLUDES += $(INC_CORE)
 INCLUDES += $(INC_LIB)
 INCLUDES += $(INC_PERIPH)
+INCLUDES += $(INC_SENSOR)
 
 DEFINES = -DSTM32 -DSTM32F0 -DSTM32F051x8 -DHEAP_SIZE=$(HEAP_SIZE)
 
