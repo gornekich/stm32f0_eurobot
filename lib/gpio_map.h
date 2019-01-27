@@ -22,4 +22,17 @@
 #define DYNAMIXEL_USART_PIN                 LL_GPIO_PIN_9
 #define DYNAMIXEL_USART_PIN_AF              LL_GPIO_AF_1
 
+/*
+ * Display pins
+ */
+#define DISP_RESET_PORT                     GPIOC
+#define DISP_RESET_PIN                      LL_GPIO_PIN_4
+#define DISP_DC_PORT                        GPIOC
+#define DISP_DC_PIN                         LL_GPIO_PIN_5
+#define DISP_SCK_PORT                       GPIOA
+#define DISP_SCK_PIN                        LL_GPIO_PIN_5
+#define DISP_MOSI_PORT                      GPIOA
+#define DISP_MOSI_PIN                       LL_GPIO_PIN_7
+
+
 #endif //_GPIO_MAP_H

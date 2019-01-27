@@ -2,6 +2,10 @@
 #define _PERIPHERIAL_H
 
 #include "stm32f051x8.h"
+#include "stm32f0xx_ll_usart.h"
+#include "stm32f0xx_ll_dma.h"
+#include "stm32f0xx_ll_spi.h"
+#include "stm32f0xx_ll_tim.h"
 
 /*
  * Communication with stm UART configuration
@@ -43,27 +47,38 @@
 #define DYNAMIXEL_USART_PARITY                  LL_USART_PARITY_NONE
 #define DYNAMIXEL_USART_STOPBITS                LL_USART_STOPBITS_1
 #define DYNAMIXEL_USART_TRANSFER_DIRECTION      LL_USART_DIRECTION_TX_RX
-/*
- * Communication with dynamixels TX DMA configuration
- */
-// #define DYNAMIXEL_DMA_TX                        DMA1
-// #define DYNAMIXEL_DMA_TX_CHANNEL                LL_DMA_CHANNEL_2
-// #define DYNAMIXEL_DMA_TX_DIRECTION              LL_DMA_DIRECTION_MEMORY_TO_PERIPH
-// #define DYNAMIXEL_DMA_TX_BUFFER_SIZE            256
-// #define DYNAMIXEL_DMA_TX_MEM_INC_MODE           LL_DMA_MEMORY_INCREMENT
-// #define DYNAMIXEL_DMA_TX_SRC_ADDR               (uint32_t)&((TERM_USART)->TDR)
+
 /*
  * Communication with dynamixels RX DMA configuration
  */
 #define DYNAMIXEL_DMA_RX                        DMA1
 #define DYNAMIXEL_DMA_RX_CHANNEL                LL_DMA_CHANNEL_3
 #define DYNAMIXEL_DMA_RX_DIRECTION              LL_DMA_DIRECTION_PERIPH_TO_MEMORY
-#define DYNAMIXEL_DMA_RX_BUFFER_SIZE            256
+#define DYNAMIXEL_DMA_RX_BUFFER_SIZE            6
 #define DYNAMIXEL_DMA_RX_MEM_INC_MODE           LL_DMA_MEMORY_INCREMENT
-#define DYNAMIXEL_DMA_RX_DEST_ADDR              (uint32_t)&((TERM_USART)->RDR)
+#define DYNAMIXEL_DMA_RX_DEST_ADDR              (uint32_t)&((DYNAMIXEL_USART)->RDR)
 #define DYNAMIXEL_DMA_RX_PERIPH_INC_MODE        LL_DMA_PERIPH_NOINCREMENT
-
 #define DYNAMIXEL_DMA_CHANNEL_IRQN              DMA1_Channel2_3_IRQn
 #define DYNAMIXEL_DMA_CHANNEL_IRQN_PRIORITY     2
+
+/*
+ * Timer for dynamixel error catcher
+ */
+#define DYNAMIXEL_TIMER                         TIM3
+#define DYNAMIXEL_TIMER_MODE                    LL_TIM_COUNTERMODE_UP
+#define DYNAMIXEL_TIMER_PSC                     47999
+#define DYNAMIXEL_TIMER_RELOAD                  1000
+#define DYNAMIXEL_TIMER_IRQN                    TIM3_IRQn
+#define DYNAMIXEL_TIMER_IRQN_PRIORITY           2
+
+/*
+ * Display control
+ */
+#define DISP_SPI                                SPI1
+#define DISP_SPI_BAUDRATE_PRESCALER             LL_SPI_BAUDRATEPRESCALER_DIV2
+#define DISP_SPI_MODE                           LL_SPI_MODE_MASTER
+#define DISP_SPI_BIT_ORDER                      LL_SPI_MSB_FIRST
+#define DISP_SPI_TRANSFER_DIR                   LL_SPI_FULL_DUPLEX
+#define DISP_SPI_DATA_WIDTH                     LL_SPI_DATAWIDTH_8BIT
 
 #endif //_PERIPHERIAL_H
