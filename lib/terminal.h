@@ -19,7 +19,6 @@
  */
 #define RX_COMPLETE 0x01
 
-
 #define is_term_flag_set(term_ctrl, bit) \
         (term_ctrl.flags & bit)
 
@@ -31,10 +30,8 @@
 
 typedef struct {
         uint8_t channel[TERM_CH_LENGTH];
+        uint8_t params[TERM_CH_LENGTH];
         uint8_t flags;
 } term_ctrl_t;
-
-void fsm_term_main(void *args);
-void fsm_term_init(void *args);
 
 #endif

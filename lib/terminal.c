@@ -5,8 +5,6 @@
 
 #include "stm32f0xx_ll_rcc.h"
 #include "stm32f0xx_ll_bus.h"
-#include "stm32f0xx_ll_usart.h"
-#include "stm32f0xx_ll_dma.h"
 
 #include <string.h>
 
@@ -34,12 +32,19 @@ void fsm_term_init(void *args)
                            LL_GPIO_MODE_ALTERNATE);
         LL_GPIO_SetAFPin_0_7(TERM_USART_TX_PORT, TERM_USART_TX_PIN,
                               TERM_USART_PIN_AF);
+        LL_GPIO_SetPinOutputType(TERM_USART_TX_PORT, TERM_USART_TX_PIN,
+                                  LL_GPIO_OUTPUT_PUSHPULL);
+        LL_GPIO_SetPinPull(TERM_USART_TX_PORT, TERM_USART_TX_PIN,
+                           LL_GPIO_PULL_DOWN);
         LL_GPIO_SetPinSpeed(TERM_USART_TX_PORT, TERM_USART_TX_PIN,
                             LL_GPIO_SPEED_FREQ_HIGH);
+
         LL_GPIO_SetPinMode(TERM_USART_RX_PORT, TERM_USART_RX_PIN,
                            LL_GPIO_MODE_ALTERNATE);
         LL_GPIO_SetAFPin_0_7(TERM_USART_RX_PORT, TERM_USART_RX_PIN,
                               TERM_USART_PIN_AF);
+        LL_GPIO_SetPinPull(TERM_USART_RX_PORT, TERM_USART_RX_PIN,
+                           LL_GPIO_PULL_NO);
         LL_GPIO_SetPinSpeed(TERM_USART_RX_PORT, TERM_USART_RX_PIN,
                             LL_GPIO_SPEED_FREQ_HIGH);
         /*
@@ -57,8 +62,6 @@ void fsm_term_init(void *args)
         LL_USART_SetBaudRate(TERM_USART, SystemCoreClock,
                              TERM_USART_OVERSAMPL, TERM_USART_BAUDRATE);
         LL_USART_EnableDMAReq_RX(TERM_USART);
-        LL_USART_EnableDirectionRx(TERM_USART);
-        LL_USART_EnableDirectionTx(TERM_USART);        
         /*
          * DMA configuration
          */
@@ -84,7 +87,7 @@ void fsm_term_init(void *args)
         LL_USART_Enable(TERM_USART);
         LL_DMA_EnableChannel(TERM_DMA, TERM_DMA_CHANNEL);
 
-        fsm_set_state(FSM_TERM_MAIN);
+        fsm_set_state(FSM_ERR_MAN_INIT);
         return;
 }
 
@@ -95,7 +98,7 @@ void fsm_term_init(void *args)
  * corresponding handler
  */
 
-void comm_send_msg(uint8_t *buff, int len)
+static void comm_send_msg(uint8_t *buff, int len)
 {
         int i = 0;
 
@@ -112,17 +115,16 @@ void fsm_term_main(void *args)
 {
         (void) args;
         uint8_t command_code = 0x00;
-        uint8_t params[TERM_CMD_LENGTH - 1];
 
         if (is_term_flag_set(term_ctrl, RX_COMPLETE)) {
                 term_clr_flag(term_ctrl, RX_COMPLETE);
                 command_code = term_ctrl.channel[0];
                 if (IS_COMMAND_VALID(command_code) &&
                     fsm_states_handlers[command_code] != NULL) {
-                        memcpy(params, &term_ctrl.channel[1], 
+                        memcpy(term_ctrl.params, &term_ctrl.channel[1],
                                TERM_CMD_LENGTH - 1);
                         fsm_set_data(command_code + FSM_TERM_CMD_START,
-                                     (void *)params);
+                                     (void *)term_ctrl.params);
                         fsm_set_state(command_code + FSM_TERM_CMD_START);
                     }
         }
