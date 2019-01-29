@@ -7,6 +7,8 @@
 #define MAX_PACK_REQ_LENGTH     32
 #define MAX_PACK_RESP_LENGTH    32
 
+#define DYN_MAX_ANGLE           0x3fff
+
 /*
  * Dynamixel set angle structure
  */

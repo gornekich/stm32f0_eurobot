@@ -7,7 +7,9 @@
 #define FONT_WIDTH              7
 #define FONT_HEIGHT             10
 
-extern uint16_t disp_font7x10[];
+#define RESET_DELAY             4800
+
+extern const uint16_t disp_font7x10[];
 
 typedef enum {
         BLACK = 0x00,

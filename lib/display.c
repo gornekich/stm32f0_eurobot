@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include <string.h>
 
 #include "display.h"
 #include "fsm.h"
@@ -68,20 +69,20 @@ static void disp_hw_config(void)
  */
 static void disp_reset(void)
 {
-        int i = 48000000 / 10000;
+        int i = RESET_DELAY;
         
         LL_GPIO_ResetOutputPin(DISP_RESET_PORT, DISP_RESET_PIN);
         while (--i);
         LL_GPIO_SetOutputPin(DISP_RESET_PORT, DISP_RESET_PIN);
-        i = 48000000 / 10000; // wait display to boot
-        while(--i);
+        i = RESET_DELAY; // wait display to boot
+        while (--i);
         return;
 }
 
 /*
  * Send command to display
  */
-static inline void disp_send_cmd(uint8_t byte)
+static void disp_send_cmd(uint8_t byte)
 {
         LL_GPIO_ResetOutputPin(DISP_DC_PORT, DISP_DC_PIN);
         LL_SPI_TransmitData8(DISP_SPI, byte);
@@ -93,7 +94,7 @@ static inline void disp_send_cmd(uint8_t byte)
 /*
  * Send data to display
  */
-static inline void disp_send_data(uint8_t *data, uint8_t len)
+static void disp_send_data(uint8_t *data, uint8_t len)
 {
         uint8_t i = 0;
 
@@ -116,10 +117,7 @@ static inline void disp_send_data(uint8_t *data, uint8_t len)
  */
 void disp_fill(disp_color color)
 {
-        uint32_t i = 0;
-
-        for (i = 0; i < sizeof(disp_buff); i++)
-                disp_buff[i] = color;
+        memset(disp_buff, color, DISP_WIDTH * DISP_HEIGHT / 8);
         return;
 }
 

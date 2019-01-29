@@ -8,7 +8,7 @@
         flag |= (0x01 << ((id) - 1))
 
 #define get_err_flag(flag, n) \
-         (((flag) >> ((n) - 1)) & 0x01)
+        (((flag) >> ((n) - 1)) & 0x01)
 
 typedef struct {
         uint8_t dyn_err_flags;

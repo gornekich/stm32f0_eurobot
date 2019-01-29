@@ -169,8 +169,8 @@ void fsm_dynamixel_init(void *args)
         /*
          * Setup Timer interrupt
          */
-        //NVIC_SetPriority(DYNAMIXEL_TIMER_IRQN, DYNAMIXEL_TIMER_IRQN_PRIORITY);
-        //NVIC_EnableIRQ(DYNAMIXEL_TIMER_IRQN);
+        NVIC_SetPriority(DYNAMIXEL_TIMER_IRQN, DYNAMIXEL_TIMER_IRQN_PRIORITY);
+        NVIC_EnableIRQ(DYNAMIXEL_TIMER_IRQN);
         /*
          * Turn on USART, DMA and Timer
          */
@@ -217,7 +217,7 @@ void fsm_dyn_set_angle(void *args)
         uint8_t tx[] = {0xff, 0xff, cmd_args->id, 0x05, 0x03, 0x1e, lowByte,
                                highByte, ~crc};
 
-        if (cmd_args->angle > 0x3fff)
+        if (cmd_args->angle > DYN_MAX_ANGLE)
                 goto set_angle_error;
         /*
          * Set tx busy flag
