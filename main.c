@@ -40,9 +40,6 @@ static void rcc_config(void)
         /* Set APB1 prescaler */
         LL_RCC_SetAPB1Prescaler(LL_RCC_APB1_DIV_1);
 
-        /* Set systick to 1ms */
-        SysTick_Config(48000000/1000);
-
         /* Update CMSIS variable (which can be updated also
          * through SystemCoreClockUpdate function) */
         SystemCoreClock = 48000000;

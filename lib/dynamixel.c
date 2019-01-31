@@ -15,6 +15,7 @@ static dyn_ctrl_t dyn_ctrl;
 /*
  * Private functions
  */
+
 /*
  * Send command
  */
@@ -198,7 +199,7 @@ void fsm_dynamixel_init(void *args)
         /*
          * Switch to init collision avoidance
          */
-        fsm_set_state(FSM_COLL_AVOID_INIT);
+        fsm_set_state(FSM_ERR_MAN_INIT);
         return;
 }
 
@@ -210,6 +211,7 @@ void fsm_dyn_set_angle(void *args)
         /*
          * Make new packet
          */
+        static const uint8_t DYN_SET_ANGLE_CMD_LEN = 9;
         dyn_set_angle_t *cmd_args = (dyn_set_angle_t *) args;
         uint8_t highByte = (uint8_t)((cmd_args->angle >> 8) & 0xff);
         uint8_t lowByte = (uint8_t)(cmd_args->angle & 0xff);
@@ -229,7 +231,8 @@ void fsm_dyn_set_angle(void *args)
          */
         if (is_dyn_flag_set(dyn_ctrl, RX_COMPLETE))
                 return;
-        dyn_send_cmd(tx, 9);
+        LL_GPIO_TogglePin(GPIOC, LL_GPIO_PIN_9);
+        dyn_send_cmd(tx, DYN_SET_ANGLE_CMD_LEN);
         fsm_set_state(FSM_TERM_MAIN);
 set_angle_error:
         fsm_set_state(FSM_TERM_MAIN);

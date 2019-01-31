@@ -95,7 +95,7 @@ void fsm_err_man_init(void *args)
                 err_ctrl.col_av_err_status[i] = 0x00;
         disp_init();
         err_man_show_err();
-        fsm_set_state(FSM_TERM_MAIN);
+        fsm_set_state(FSM_TERM_INIT);
 }
 
 /*

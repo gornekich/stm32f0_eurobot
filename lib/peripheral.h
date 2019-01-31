@@ -67,7 +67,7 @@
 #define DYNAMIXEL_TIMER                         TIM3
 #define DYNAMIXEL_TIMER_MODE                    LL_TIM_COUNTERMODE_UP
 #define DYNAMIXEL_TIMER_PSC                     47999
-#define DYNAMIXEL_TIMER_RELOAD                  1000
+#define DYNAMIXEL_TIMER_RELOAD                  10000
 #define DYNAMIXEL_TIMER_IRQN                    TIM3_IRQn
 #define DYNAMIXEL_TIMER_IRQN_PRIORITY           2
 
