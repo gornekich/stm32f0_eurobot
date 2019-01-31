@@ -20,6 +20,9 @@ void fsm_coll_avoid_init(void *args)
         uint32_t refSpadCount;
         uint8_t isApertureSpads;
 
+        fsm_set_state(FSM_TERM_MAIN);
+        return;
+
         VL53L0X_hw_config();
 
         MyDevice.I2cDevAddr = 0x52;

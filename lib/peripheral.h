@@ -81,4 +81,14 @@
 #define DISP_SPI_TRANSFER_DIR                   LL_SPI_FULL_DUPLEX
 #define DISP_SPI_DATA_WIDTH                     LL_SPI_DATAWIDTH_8BIT
 
+/*
+ * Proximity sensors I2C bus
+ * 100 KHz data communication, Fclk = 48 MHz
+ * PRESC = 0xB, SCLL = 0x13, SCLH = 0xF, SDADEL = 0x2, SCLDEL = 0x4
+ */
+#define COL_AV_I2C                              I2C1
+#define COL_AV_I2C_ADDR_MODE                    LL_I2C_ADDRESSING_MODE_7BIT
+#define COL_AV_I2C_MODE                         LL_I2C_MODE_I2C
+#define COL_AV_I2C_TIMING                       0xB0420F13
+
 #endif //_PERIPHERIAL_H

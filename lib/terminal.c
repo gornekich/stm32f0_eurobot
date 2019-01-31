@@ -87,7 +87,7 @@ void fsm_term_init(void *args)
         LL_USART_Enable(TERM_USART);
         LL_DMA_EnableChannel(TERM_DMA, TERM_DMA_CHANNEL);
 
-        fsm_set_state(FSM_TERM_MAIN);
+        fsm_set_state(FSM_COLL_AVOID_INIT);
         return;
 }
 

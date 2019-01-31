@@ -34,5 +34,27 @@
 #define DISP_MOSI_PORT                      GPIOA
 #define DISP_MOSI_PIN                       LL_GPIO_PIN_7
 
+/*
+ * Proximity sensors pins and I2C bus
+ */
+#define COL_AV_XSHUT_PORT                   GPIOC
+#define COL_AV_XSHUT_PIN1                   LL_GPIO_PIN_0
+#define COL_AV_XSHUT_PIN2                   LL_GPIO_PIN_1
+#define COL_AV_XSHUT_PIN3                   LL_GPIO_PIN_2
+#define COL_AV_XSHUT_PIN4                   LL_GPIO_PIN_3
+#define COL_AV_XSHUT_PIN5                   LL_GPIO_PIN_6
+#define COL_AV_XSHUT_PIN6                   LL_GPIO_PIN_7
+
+#define COL_AV_INT_PORT                     GPIOB
+#define COL_AV_INT_PIN1                     LL_GPIO_PIN_0
+#define COL_AV_INT_PIN2                     LL_GPIO_PIN_1
+#define COL_AV_INT_PIN3                     LL_GPIO_PIN_2
+#define COL_AV_INT_PIN4                     LL_GPIO_PIN_3
+#define COL_AV_INT_PIN5                     LL_GPIO_PIN_4
+#define COL_AV_INT_PIN6                     LL_GPIO_PIN_5
+
+#define COL_AV_I2C_PORT                     GPIOB
+#define COL_AV_I2C_SCL                      LL_GPIO_PIN_6
+#define COL_AV_I2C_SDA                      LL_GPIO_PIN_7
 
 #endif //_GPIO_MAP_H

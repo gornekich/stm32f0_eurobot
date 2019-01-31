@@ -6,39 +6,37 @@
 #include "stm32f0xx_ll_rcc.h"
 #include "stm32f0xx_ll_system.h"
 #include "stm32f0xx_ll_i2c.h"
-
+#include "peripheral.h"
+#include "gpio_map.h"
 void VL53L0X_hw_config(void)
 {
     /*
      * Clock on the I2C port
      */
     LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_GPIOB);
-    // I2C_SCL
-    LL_GPIO_SetPinMode(GPIOB, LL_GPIO_PIN_6, LL_GPIO_MODE_ALTERNATE);
-    LL_GPIO_SetPinOutputType(GPIOB, LL_GPIO_PIN_6,
+    LL_GPIO_SetPinMode(COL_AV_I2C_PORT, COL_AV_I2C_SCL, LL_GPIO_MODE_ALTERNATE);
+    LL_GPIO_SetPinOutputType(COL_AV_I2C_PORT, COL_AV_I2C_SCL,
                              LL_GPIO_OUTPUT_OPENDRAIN);
-    LL_GPIO_SetAFPin_0_7(GPIOB, LL_GPIO_PIN_6, LL_GPIO_AF_1);
-    LL_GPIO_SetPinSpeed(GPIOB, LL_GPIO_PIN_6, LL_GPIO_SPEED_FREQ_HIGH);
-    // I2C_SDA
-    LL_GPIO_SetPinMode(GPIOB, LL_GPIO_PIN_7, LL_GPIO_MODE_ALTERNATE);
-    LL_GPIO_SetPinOutputType(GPIOB, LL_GPIO_PIN_6,
+    LL_GPIO_SetAFPin_0_7(COL_AV_I2C_PORT, COL_AV_I2C_SCL, LL_GPIO_AF_1);
+    LL_GPIO_SetPinSpeed(COL_AV_I2C_PORT, COL_AV_I2C_SCL, LL_GPIO_SPEED_FREQ_HIGH);
+
+    LL_GPIO_SetPinMode(COL_AV_I2C_PORT, COL_AV_I2C_SDA, LL_GPIO_MODE_ALTERNATE);
+    LL_GPIO_SetPinOutputType(COL_AV_I2C_PORT, COL_AV_I2C_SDA,
                              LL_GPIO_OUTPUT_OPENDRAIN);
-    LL_GPIO_SetAFPin_0_7(GPIOB, LL_GPIO_PIN_7, LL_GPIO_AF_1);
-    LL_GPIO_SetPinSpeed(GPIOB, LL_GPIO_PIN_7, LL_GPIO_SPEED_FREQ_HIGH);
+    LL_GPIO_SetAFPin_0_7(COL_AV_I2C_PORT, COL_AV_I2C_SDA, LL_GPIO_AF_1);
+    LL_GPIO_SetPinSpeed(COL_AV_I2C_PORT, COL_AV_I2C_SDA, LL_GPIO_SPEED_FREQ_HIGH);
     /*
      * Clock on the I2C peripheral
      */
     LL_RCC_SetI2CClockSource(LL_RCC_I2C1_CLKSOURCE_SYSCLK);
     LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_I2C1);
-    LL_I2C_DisableAnalogFilter(I2C1);
-    LL_I2C_SetDigitalFilter(I2C1, 1);
-    // 100 KHz data communication, Fclk = 48 MHz
-    // PRESC = 0xB, SCLL = 0x13, SCLH = 0xF, SDADEL = 0x2, SCLDEL = 0x4
-    LL_I2C_SetTiming(I2C1, 0xB0420F13);
-    LL_I2C_DisableClockStretching(I2C1);
-    LL_I2C_SetMasterAddressingMode(I2C1, LL_I2C_ADDRESSING_MODE_7BIT);
-    LL_I2C_SetMode(I2C1, LL_I2C_MODE_I2C);
-    LL_I2C_Enable(I2C1);
+    LL_I2C_DisableAnalogFilter(COL_AV_I2C);
+    LL_I2C_SetDigitalFilter(COL_AV_I2C, 1);
+    LL_I2C_SetTiming(COL_AV_I2C, COL_AV_I2C_TIMING);
+    LL_I2C_DisableClockStretching(COL_AV_I2C);
+    LL_I2C_SetMasterAddressingMode(COL_AV_I2C, COL_AV_I2C_ADDR_MODE);
+    LL_I2C_SetMode(COL_AV_I2C, COL_AV_I2C_MODE);
+    LL_I2C_Enable(COL_AV_I2C);
     return;
 }
 
@@ -51,25 +49,25 @@ VL53L0X_Error VL53L0X_WriteMulti(VL53L0X_DEV Dev, uint8_t index,
     /*
      * Init transmit and set all params
      */
-    LL_I2C_HandleTransfer(I2C1, Dev->I2cDevAddr, LL_I2C_ADDRSLAVE_7BIT,
+    LL_I2C_HandleTransfer(COL_AV_I2C, Dev->I2cDevAddr, LL_I2C_ADDRSLAVE_7BIT,
                           count + 1, LL_I2C_MODE_AUTOEND,
                           LL_I2C_GENERATE_START_WRITE);
     /*
      * Wait till I2C is ready to transmit and send address of reg
      */
-    while (!LL_I2C_IsActiveFlag_TXIS(I2C1));
-    LL_I2C_TransmitData8(I2C1, index);
+    while (!LL_I2C_IsActiveFlag_TXIS(COL_AV_I2C));
+    LL_I2C_TransmitData8(COL_AV_I2C, index);
     /*
      * Send all data to slave waiting for TXIS on each step
      */
     for (i = 0; i < count; i++) {
-        while (!LL_I2C_IsActiveFlag_TXIS(I2C1));
-        LL_I2C_TransmitData8(I2C1, pdata[i]);
+        while (!LL_I2C_IsActiveFlag_TXIS(COL_AV_I2C));
+        LL_I2C_TransmitData8(COL_AV_I2C, pdata[i]);
     }
     /*
      * Check for end of transmission
      */
-    while (LL_I2C_IsActiveFlag_TC(I2C1));
+    while (LL_I2C_IsActiveFlag_TC(COL_AV_I2C));
 
     return VL53L0X_ERROR_NONE;
 }
@@ -82,35 +80,35 @@ VL53L0X_Error VL53L0X_ReadMulti(VL53L0X_DEV Dev, uint8_t index,
     /*
      * Init transmit of register address
      */
-    LL_I2C_HandleTransfer(I2C1, Dev->I2cDevAddr, LL_I2C_ADDRSLAVE_7BIT,
+    LL_I2C_HandleTransfer(COL_AV_I2C, Dev->I2cDevAddr, LL_I2C_ADDRSLAVE_7BIT,
                           1, LL_I2C_MODE_AUTOEND,
                           LL_I2C_GENERATE_START_WRITE);
     /*
      * Wait till I2C is ready to transmit and send reg address
      */
-    while (!LL_I2C_IsActiveFlag_TXIS(I2C1));
-    LL_I2C_TransmitData8(I2C1, index);
+    while (!LL_I2C_IsActiveFlag_TXIS(COL_AV_I2C));
+    LL_I2C_TransmitData8(COL_AV_I2C, index);
     /*
      * Check for end of transmission
      */
-    while (LL_I2C_IsActiveFlag_TC(I2C1));
+    while (LL_I2C_IsActiveFlag_TC(COL_AV_I2C));
     /*
      * Init reading of package size of count
      */
-    LL_I2C_HandleTransfer(I2C1, Dev->I2cDevAddr, LL_I2C_ADDRSLAVE_7BIT,
+    LL_I2C_HandleTransfer(COL_AV_I2C, Dev->I2cDevAddr, LL_I2C_ADDRSLAVE_7BIT,
                           count, LL_I2C_MODE_AUTOEND,
                           LL_I2C_GENERATE_START_READ);
     /*
      * Receive all data from the slave
      */
     for (i = 0; i < count; i++) {
-        while (!LL_I2C_IsActiveFlag_RXNE(I2C1));
-        pdata[i] = LL_I2C_ReceiveData8(I2C1);
+        while (!LL_I2C_IsActiveFlag_RXNE(COL_AV_I2C));
+        pdata[i] = LL_I2C_ReceiveData8(COL_AV_I2C);
     }
     /*
      * Check for end of receiving
      */
-    while (LL_I2C_IsActiveFlag_TC(I2C1));
+    while (LL_I2C_IsActiveFlag_TC(COL_AV_I2C));
 
     return VL53L0X_ERROR_NONE;
 }
