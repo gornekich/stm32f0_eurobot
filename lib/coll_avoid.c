@@ -16,7 +16,6 @@
 #include "display.h"
 #include "xprintf.h"
 
-static VL53L0X_Dev_t MyDevice;
 static col_avoid_ctrl_t col_avoid_ctrl[NUMBER_OF_PROX_SENSORS];
 
 void fsm_coll_avoid_init(void *args)
@@ -53,7 +52,7 @@ void fsm_coll_avoid_init(void *args)
                 VL53L0X_StartMeasurement(&GET_DEV(ca_ctrl));
         foreach_ca_ctrl_end(ca_ctrl)
 
-        //fsm_add_shadow_state(FSM_COLL_AVOID_MAIN);
+        fsm_add_shadow_state(FSM_COLL_AVOID_MAIN);
         fsm_set_state(FSM_TERM_MAIN);
         return;
 }
@@ -63,9 +62,18 @@ void fsm_coll_avoid_main(void *args)
         (void) args;
         VL53L0X_RangingMeasurementData_t RangingMeasurementData;
 
-        VL53L0X_GetRangingMeasurementData(&MyDevice, &RangingMeasurementData);
-        //xprintf("data: %d sm\n", RangingMeasurementData.RangeMilliMeter/10);
-        VL53L0X_ClearInterruptMask(&MyDevice,
+        VL53L0X_GetRangingMeasurementData(&GET_DEV_ID(0),
+                                          &RangingMeasurementData);
+        disp_set_cursor(1, 4);
+        xprintf("data0: %d cm\n", RangingMeasurementData.RangeMilliMeter/10);
+        VL53L0X_ClearInterruptMask(&GET_DEV_ID(0),
+                          VL53L0X_REG_SYSTEM_INTERRUPT_GPIO_NEW_SAMPLE_READY);
+
+        VL53L0X_GetRangingMeasurementData(&GET_DEV_ID(1),
+                                          &RangingMeasurementData);
+        disp_set_cursor(1, 5);
+        xprintf("data1: %d cm\n", RangingMeasurementData.RangeMilliMeter/10);
+        VL53L0X_ClearInterruptMask(&GET_DEV_ID(1),
                           VL53L0X_REG_SYSTEM_INTERRUPT_GPIO_NEW_SAMPLE_READY);
         return;
 }
