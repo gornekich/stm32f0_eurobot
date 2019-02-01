@@ -8,25 +8,65 @@
 #include "stm32f0xx_ll_i2c.h"
 #include "peripheral.h"
 #include "gpio_map.h"
-void VL53L0X_hw_config(void)
+
+void VL53L0X_hw_config(uint32_t *xshut_pin)
 {
     /*
-     * Clock on the I2C port
+     * Clock on the I2C port and configure it
      */
     LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_GPIOB);
-    LL_GPIO_SetPinMode(COL_AV_I2C_PORT, COL_AV_I2C_SCL, LL_GPIO_MODE_ALTERNATE);
+    LL_GPIO_SetPinMode(COL_AV_I2C_PORT, COL_AV_I2C_SCL,
+                       LL_GPIO_MODE_ALTERNATE);
     LL_GPIO_SetPinOutputType(COL_AV_I2C_PORT, COL_AV_I2C_SCL,
                              LL_GPIO_OUTPUT_OPENDRAIN);
     LL_GPIO_SetAFPin_0_7(COL_AV_I2C_PORT, COL_AV_I2C_SCL, LL_GPIO_AF_1);
-    LL_GPIO_SetPinSpeed(COL_AV_I2C_PORT, COL_AV_I2C_SCL, LL_GPIO_SPEED_FREQ_HIGH);
+    LL_GPIO_SetPinSpeed(COL_AV_I2C_PORT, COL_AV_I2C_SCL,
+                        LL_GPIO_SPEED_FREQ_HIGH);
 
-    LL_GPIO_SetPinMode(COL_AV_I2C_PORT, COL_AV_I2C_SDA, LL_GPIO_MODE_ALTERNATE);
+    LL_GPIO_SetPinMode(COL_AV_I2C_PORT, COL_AV_I2C_SDA,
+                       LL_GPIO_MODE_ALTERNATE);
     LL_GPIO_SetPinOutputType(COL_AV_I2C_PORT, COL_AV_I2C_SDA,
                              LL_GPIO_OUTPUT_OPENDRAIN);
     LL_GPIO_SetAFPin_0_7(COL_AV_I2C_PORT, COL_AV_I2C_SDA, LL_GPIO_AF_1);
-    LL_GPIO_SetPinSpeed(COL_AV_I2C_PORT, COL_AV_I2C_SDA, LL_GPIO_SPEED_FREQ_HIGH);
+    LL_GPIO_SetPinSpeed(COL_AV_I2C_PORT, COL_AV_I2C_SDA,
+                        LL_GPIO_SPEED_FREQ_HIGH);
     /*
-     * Clock on the I2C peripheral
+     * Configure XSHUT pins (to set up I2C addresses for sensors
+     * in advance)
+     */
+    LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_GPIOC);
+    LL_GPIO_SetPinMode(COL_AV_XSHUT_PORT, COL_AV_XSHUT_PIN1,
+                       LL_GPIO_MODE_OUTPUT);
+    LL_GPIO_SetPinOutputType(COL_AV_XSHUT_PORT, COL_AV_XSHUT_PIN1,
+                             LL_GPIO_OUTPUT_PUSHPULL);
+    xshut_pin[0] = COL_AV_XSHUT_PIN1;
+    LL_GPIO_SetPinMode(COL_AV_XSHUT_PORT, COL_AV_XSHUT_PIN2,
+                       LL_GPIO_MODE_OUTPUT);
+    LL_GPIO_SetPinOutputType(COL_AV_XSHUT_PORT, COL_AV_XSHUT_PIN2,
+                             LL_GPIO_OUTPUT_PUSHPULL);
+    xshut_pin[1] = COL_AV_XSHUT_PIN2;
+    LL_GPIO_SetPinMode(COL_AV_XSHUT_PORT, COL_AV_XSHUT_PIN3,
+                       LL_GPIO_MODE_OUTPUT);
+    LL_GPIO_SetPinOutputType(COL_AV_XSHUT_PORT, COL_AV_XSHUT_PIN3,
+                             LL_GPIO_OUTPUT_PUSHPULL);
+    xshut_pin[2] = COL_AV_XSHUT_PIN2;
+    LL_GPIO_SetPinMode(COL_AV_XSHUT_PORT, COL_AV_XSHUT_PIN4,
+                       LL_GPIO_MODE_OUTPUT);
+    LL_GPIO_SetPinOutputType(COL_AV_XSHUT_PORT, COL_AV_XSHUT_PIN4,
+                             LL_GPIO_OUTPUT_PUSHPULL);
+    xshut_pin[3] = COL_AV_XSHUT_PIN3;
+    LL_GPIO_SetPinMode(COL_AV_XSHUT_PORT, COL_AV_XSHUT_PIN5,
+                       LL_GPIO_MODE_OUTPUT);
+    LL_GPIO_SetPinOutputType(COL_AV_XSHUT_PORT, COL_AV_XSHUT_PIN5,
+                             LL_GPIO_OUTPUT_PUSHPULL);
+    xshut_pin[4] = COL_AV_XSHUT_PIN4;
+    LL_GPIO_SetPinMode(COL_AV_XSHUT_PORT, COL_AV_XSHUT_PIN6,
+                       LL_GPIO_MODE_OUTPUT);
+    LL_GPIO_SetPinOutputType(COL_AV_XSHUT_PORT, COL_AV_XSHUT_PIN6,
+                             LL_GPIO_OUTPUT_PUSHPULL);
+    xshut_pin[5] = COL_AV_XSHUT_PIN5;
+    /*
+     * Clock on the I2C peripheral and set it up
      */
     LL_RCC_SetI2CClockSource(LL_RCC_I2C1_CLKSOURCE_SYSCLK);
     LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_I2C1);

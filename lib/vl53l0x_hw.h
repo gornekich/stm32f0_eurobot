@@ -3,7 +3,7 @@
 
 #include "vl53l0x_def.h"
 
-void VL53L0X_hw_config(void);
+void VL53L0X_hw_config(uint32_t *shut_pin);
 
 /**
  * @struct  VL53L0X_Dev_t
