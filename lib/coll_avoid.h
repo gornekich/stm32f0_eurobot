@@ -13,6 +13,8 @@ typedef struct {
 } col_avoid_ctrl_t;
 
 #define GET_DEV(av_ctrl) av_ctrl->MyDevice
+#define GET_DEV_ID(id) col_avoid_ctrl[id].MyDevice
+
 #define foreach_ca_ctrl(gen_struct, iter) \
         col_avoid_ctrl_t *iter = NULL; \
         for (int i = 0; i < NUMBER_OF_PROX_SENSORS; i++) { \
