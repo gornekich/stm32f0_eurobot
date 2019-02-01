@@ -14,10 +14,9 @@ typedef struct {
 
 #define GET_DEV(av_ctrl) av_ctrl->MyDevice
 #define foreach_ca_ctrl(gen_struct, iter) \
-        col_avoid_ctrl_t *iter; \
-        for (int i = 0; \
-             i < NUMBER_OF_PROX_SENSORS; \
-             i++, iter=gen_struct + i) {
+        col_avoid_ctrl_t *iter = NULL; \
+        for (int i = 0; i < NUMBER_OF_PROX_SENSORS; i++) { \
+            iter=&gen_struct[i];
 
 #define foreach_ca_ctrl_end(iter) \
         } \

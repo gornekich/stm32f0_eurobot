@@ -27,19 +27,18 @@ void fsm_coll_avoid_init(void *args)
 
         VL53L0X_hw_config(xshut_pin);
         foreach_ca_ctrl(col_avoid_ctrl, ca_ctrl)
-                disp_set_cursor(5, 1);
+                LL_GPIO_SetOutputPin(COL_AV_XSHUT_PORT, xshut_pin[i]);
+                disp_set_cursor(1, 4);
                 xprintf("sensor: #%d", i);
                 disp_update();
-                LL_GPIO_SetOutputPin(COL_AV_XSHUT_PORT, xshut_pin[i]);
                 GET_DEV(ca_ctrl).I2cDevAddr = CA_DEF_ADDR;
                 status = VL53L0X_DataInit(&GET_DEV(ca_ctrl));
                 if (status != VL53L0X_ERROR_NONE) {
-                        disp_set_cursor(6, 1);
+                        disp_set_cursor(1, 5);
                         xprintf("error!: #%d", i);
                         disp_update();
                         continue;
                 }
-                VL53L0X_DataInit(&GET_DEV(ca_ctrl));
                 VL53L0X_StaticInit(&GET_DEV(ca_ctrl));
                 VL53L0X_PerformRefCalibration(&GET_DEV(ca_ctrl),
                         &ca_ctrl->vhv_settings,
