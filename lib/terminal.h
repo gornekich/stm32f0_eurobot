@@ -34,4 +34,10 @@ typedef struct {
         uint8_t flags;
 } term_ctrl_t;
 
+/*
+ * Public function for stm32f4 communication
+ * TODO don't use it in coll_avoid and make it private
+ */
+void comm_send_msg(uint8_t *buff, int len);
+
 #endif

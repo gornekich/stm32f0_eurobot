@@ -49,22 +49,22 @@ void VL53L0X_hw_config(uint32_t *xshut_pin)
                        LL_GPIO_MODE_OUTPUT);
     LL_GPIO_SetPinOutputType(COL_AV_XSHUT_PORT, COL_AV_XSHUT_PIN3,
                              LL_GPIO_OUTPUT_PUSHPULL);
-    xshut_pin[2] = COL_AV_XSHUT_PIN2;
+    xshut_pin[2] = COL_AV_XSHUT_PIN3;
     LL_GPIO_SetPinMode(COL_AV_XSHUT_PORT, COL_AV_XSHUT_PIN4,
                        LL_GPIO_MODE_OUTPUT);
     LL_GPIO_SetPinOutputType(COL_AV_XSHUT_PORT, COL_AV_XSHUT_PIN4,
                              LL_GPIO_OUTPUT_PUSHPULL);
-    xshut_pin[3] = COL_AV_XSHUT_PIN3;
+    xshut_pin[3] = COL_AV_XSHUT_PIN4;
     LL_GPIO_SetPinMode(COL_AV_XSHUT_PORT, COL_AV_XSHUT_PIN5,
                        LL_GPIO_MODE_OUTPUT);
     LL_GPIO_SetPinOutputType(COL_AV_XSHUT_PORT, COL_AV_XSHUT_PIN5,
                              LL_GPIO_OUTPUT_PUSHPULL);
-    xshut_pin[4] = COL_AV_XSHUT_PIN4;
+    xshut_pin[4] = COL_AV_XSHUT_PIN5;
     LL_GPIO_SetPinMode(COL_AV_XSHUT_PORT, COL_AV_XSHUT_PIN6,
                        LL_GPIO_MODE_OUTPUT);
     LL_GPIO_SetPinOutputType(COL_AV_XSHUT_PORT, COL_AV_XSHUT_PIN6,
                              LL_GPIO_OUTPUT_PUSHPULL);
-    xshut_pin[5] = COL_AV_XSHUT_PIN5;
+    xshut_pin[5] = COL_AV_XSHUT_PIN6;
     /*
      * Clock on the I2C peripheral and set it up
      */

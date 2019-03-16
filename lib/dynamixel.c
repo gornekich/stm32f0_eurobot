@@ -63,34 +63,34 @@ void fsm_dynamixel_error_catch(void *args)
          * Check for errors here
          */
         (void) args;
-        static uint8_t cur_id = 1;
-        static dyn_status_pack_t *dyn_stat;
+        // static uint8_t cur_id = 1;
+        // static dyn_status_pack_t *dyn_stat;
 
-        if (is_dyn_flag_set(dyn_ctrl, RX_COMPLETE)) {
-                /*
-                 * Clear RX_COMPLETE flag
-                 */
-                dyn_clr_flag(dyn_ctrl, RX_COMPLETE);
-                dyn_clr_flag(dyn_ctrl, CHECK_DYNAMIXEL);
-                /*
-                 * Process status packet and save status
-                 */
-                dyn_stat = (dyn_status_pack_t *) dyn_ctrl.channel_rx;
-                dyn_ctrl.status[dyn_stat->id] = dyn_stat->err;
-                if (dyn_stat->err) {
-                        err_man_update_dyn_status(dyn_stat->id, dyn_stat->err);
-                        fsm_set_state(FSM_ERR_MAN_SHOW_ERR);
-                }
-                /*
-                 * Request status packet from next dynamixel if tx is not busy
-                 */
-                if (!is_dyn_flag_set(dyn_ctrl, TX_BUSY) &&
-                    is_dyn_flag_set(dyn_ctrl, CHECK_DYNAMIXEL)) {
-                        dyn_ping(cur_id++);
-                        if (cur_id > NUMBER_OF_DYNAMIXELS)
-                                cur_id = 1;
-                }
-        }
+        // if (is_dyn_flag_set(dyn_ctrl, RX_COMPLETE)) {
+        //         /*
+        //          * Clear RX_COMPLETE flag
+        //          */
+        //         dyn_clr_flag(dyn_ctrl, RX_COMPLETE);
+        //         dyn_clr_flag(dyn_ctrl, CHECK_DYNAMIXEL);
+        //         /*
+        //          * Process status packet and save status
+        //          */
+        //         dyn_stat = (dyn_status_pack_t *) dyn_ctrl.channel_rx;
+        //         dyn_ctrl.status[dyn_stat->id] = dyn_stat->err;
+        //         if (dyn_stat->err) {
+        //                 err_man_update_dyn_status(dyn_stat->id, dyn_stat->err);
+        //                 fsm_set_state(FSM_ERR_MAN_SHOW_ERR);
+        //         }
+        //         /*
+        //          * Request status packet from next dynamixel if tx is not busy
+        //          */
+        //         if (!is_dyn_flag_set(dyn_ctrl, TX_BUSY) &&
+        //             is_dyn_flag_set(dyn_ctrl, CHECK_DYNAMIXEL)) {
+        //                 dyn_ping(cur_id++);
+        //                 if (cur_id > NUMBER_OF_DYNAMIXELS)
+        //                         cur_id = 1;
+        //         }
+        // }
         return;
 }
 
@@ -105,7 +105,7 @@ void fsm_dynamixel_init(void *args)
         (void) args;
         int i = 0;
 
-        fsm_add_shadow_state(FSM_DYNAMIXEL_ERROR_CATCH);
+        //fsm_add_shadow_state(FSM_DYNAMIXEL_ERROR_CATCH);
         /*
          * Initialization code
          */
@@ -152,7 +152,7 @@ void fsm_dynamixel_init(void *args)
                                DYNAMIXEL_DMA_RX_MEM_INC_MODE);
         LL_DMA_SetMode(DYNAMIXEL_DMA_RX, DYNAMIXEL_DMA_RX_CHANNEL,
                        LL_DMA_MODE_CIRCULAR);
-        LL_DMA_EnableIT_TC(DYNAMIXEL_DMA_RX, DYNAMIXEL_DMA_RX_CHANNEL);
+        //LL_DMA_EnableIT_TC(DYNAMIXEL_DMA_RX, DYNAMIXEL_DMA_RX_CHANNEL);
         /*
          * Timer setting for dynamixel error catcher
          */
@@ -177,7 +177,7 @@ void fsm_dynamixel_init(void *args)
          */
         LL_DMA_EnableChannel(DYNAMIXEL_DMA_RX, DYNAMIXEL_DMA_RX_CHANNEL);
         LL_USART_Enable(DYNAMIXEL_USART);
-        LL_TIM_EnableCounter(DYNAMIXEL_TIMER);
+        //LL_TIM_EnableCounter(DYNAMIXEL_TIMER);
         /*
          * Clear rx complete flag
          */
@@ -204,7 +204,7 @@ void fsm_dynamixel_init(void *args)
 }
 
 /*
- * Terminal comands implementation
+ * Terminal commands implementation
  */
 void fsm_dyn_set_angle(void *args)
 {
@@ -229,8 +229,8 @@ void fsm_dyn_set_angle(void *args)
          * If receive is not complete, wait until error catcher process status
          * packet, don't switch to another state
          */
-        if (is_dyn_flag_set(dyn_ctrl, RX_COMPLETE))
-                return;
+        // if (is_dyn_flag_set(dyn_ctrl, RX_COMPLETE))
+        //         return;
         LL_GPIO_TogglePin(GPIOC, LL_GPIO_PIN_9);
         dyn_send_cmd(tx, DYN_SET_ANGLE_CMD_LEN);
         fsm_set_state(FSM_TERM_MAIN);

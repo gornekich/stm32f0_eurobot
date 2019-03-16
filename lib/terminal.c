@@ -98,7 +98,7 @@ void fsm_term_init(void *args)
  * corresponding handler
  */
 
-static void comm_send_msg(uint8_t *buff, int len)
+void comm_send_msg(uint8_t *buff, int len)
 {
         int i = 0;
 
