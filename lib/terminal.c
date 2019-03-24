@@ -78,7 +78,7 @@ void fsm_term_init(void *args)
         /*
          * NVIC configuration
          */
-        NVIC_SetPriority(TERM_DMA_CHANNEL_IRQN, 
+        NVIC_SetPriority(TERM_DMA_CHANNEL_IRQN,
                          TERM_DMA_CHANNEL_IRQN_PRIORITY);
         NVIC_EnableIRQ(TERM_DMA_CHANNEL_IRQN);
         /*

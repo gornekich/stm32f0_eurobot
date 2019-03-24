@@ -15,15 +15,16 @@ typedef struct {
 #define GET_DEV(av_ctrl) av_ctrl->MyDevice
 #define GET_DEV_ID(id) col_avoid_ctrl[id].MyDevice
 
-#define foreach_ca_ctrl(gen_struct, iter) \
+#define FOREACH_CA_CTRL(gen_struct, iter) \
         col_avoid_ctrl_t *iter = NULL; \
         for (int i = 0; i < NUMBER_OF_PROX_SENSORS; i++) { \
             iter=&gen_struct[i];
 
-#define foreach_ca_ctrl_end(iter) \
+#define FOREACH_CA_CTRL_END(iter) \
         } \
         (void) iter;
 
 #define CA_DEF_ADDR 0x52
+#define CA_ADDR_DIST 0x5
 
 #endif

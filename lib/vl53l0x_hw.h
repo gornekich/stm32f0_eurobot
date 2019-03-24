@@ -2,8 +2,9 @@
 #define _VL53l0X_HW_H_
 
 #include "vl53l0x_def.h"
+#include "gpio_map.h"
 
-void VL53L0X_hw_config(uint32_t *shut_pin);
+void VL53L0X_hw_config(const out_t **xshut_pin);
 
 /**
  * @struct  VL53L0X_Dev_t

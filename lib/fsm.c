@@ -111,7 +111,7 @@ void fsm_state_mng(void)
         /*
          * When current state is shadow take next shadow task and swap
          */
-        next_shadow %= MAX_SHADOW_STATE;
+        next_shadow = (next_shadow + 1) % MAX_SHADOW_STATE;
         if (fsm_ctrl.shadow_state[next_shadow] != LOWER_BOUND_CASE)
                 fsm_ctrl.state = fsm_ctrl.shadow_state[next_shadow];
         else

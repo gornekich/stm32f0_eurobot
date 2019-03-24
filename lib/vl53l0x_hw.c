@@ -6,11 +6,18 @@
 #include "stm32f0xx_ll_rcc.h"
 #include "stm32f0xx_ll_system.h"
 #include "stm32f0xx_ll_i2c.h"
+#include "stm32f0xx_ll_exti.h"
 #include "peripheral.h"
 #include "gpio_map.h"
+#include "dev_map.h"
 
-void VL53L0X_hw_config(uint32_t *xshut_pin)
-{
+/*
+ * Configuration structures for control pins
+ */
+static const out_t xshut_config[] = COL_AV_XSHUT_CONFIG;
+
+void VL53L0X_hw_config(const out_t **xshut_pin) {
+    uint16_t i;
     /*
      * Clock on the I2C port and configure it
      */
@@ -33,38 +40,18 @@ void VL53L0X_hw_config(uint32_t *xshut_pin)
     /*
      * Configure XSHUT pins (to set up I2C addresses for sensors
      * in advance)
+     * NOTE: take care of clocking on corresponding ports!
      */
     LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_GPIOC);
-    LL_GPIO_SetPinMode(COL_AV_XSHUT_PORT, COL_AV_XSHUT_PIN1,
-                       LL_GPIO_MODE_OUTPUT);
-    LL_GPIO_SetPinOutputType(COL_AV_XSHUT_PORT, COL_AV_XSHUT_PIN1,
-                             LL_GPIO_OUTPUT_PUSHPULL);
-    xshut_pin[0] = COL_AV_XSHUT_PIN1;
-    LL_GPIO_SetPinMode(COL_AV_XSHUT_PORT, COL_AV_XSHUT_PIN2,
-                       LL_GPIO_MODE_OUTPUT);
-    LL_GPIO_SetPinOutputType(COL_AV_XSHUT_PORT, COL_AV_XSHUT_PIN2,
-                             LL_GPIO_OUTPUT_PUSHPULL);
-    xshut_pin[1] = COL_AV_XSHUT_PIN2;
-    LL_GPIO_SetPinMode(COL_AV_XSHUT_PORT, COL_AV_XSHUT_PIN3,
-                       LL_GPIO_MODE_OUTPUT);
-    LL_GPIO_SetPinOutputType(COL_AV_XSHUT_PORT, COL_AV_XSHUT_PIN3,
-                             LL_GPIO_OUTPUT_PUSHPULL);
-    xshut_pin[2] = COL_AV_XSHUT_PIN2;
-    LL_GPIO_SetPinMode(COL_AV_XSHUT_PORT, COL_AV_XSHUT_PIN4,
-                       LL_GPIO_MODE_OUTPUT);
-    LL_GPIO_SetPinOutputType(COL_AV_XSHUT_PORT, COL_AV_XSHUT_PIN4,
-                             LL_GPIO_OUTPUT_PUSHPULL);
-    xshut_pin[3] = COL_AV_XSHUT_PIN3;
-    LL_GPIO_SetPinMode(COL_AV_XSHUT_PORT, COL_AV_XSHUT_PIN5,
-                       LL_GPIO_MODE_OUTPUT);
-    LL_GPIO_SetPinOutputType(COL_AV_XSHUT_PORT, COL_AV_XSHUT_PIN5,
-                             LL_GPIO_OUTPUT_PUSHPULL);
-    xshut_pin[4] = COL_AV_XSHUT_PIN4;
-    LL_GPIO_SetPinMode(COL_AV_XSHUT_PORT, COL_AV_XSHUT_PIN6,
-                       LL_GPIO_MODE_OUTPUT);
-    LL_GPIO_SetPinOutputType(COL_AV_XSHUT_PORT, COL_AV_XSHUT_PIN6,
-                             LL_GPIO_OUTPUT_PUSHPULL);
-    xshut_pin[5] = COL_AV_XSHUT_PIN5;
+    for (i = 0; i < NUMBER_OF_PROX_SENSORS; i++) {
+        LL_GPIO_SetPinMode(xshut_config[i].port, xshut_config[i].pin,
+                           LL_GPIO_MODE_OUTPUT);
+        LL_GPIO_SetPinOutputType(xshut_config[i].port, xshut_config[i].pin,
+                                 LL_GPIO_OUTPUT_PUSHPULL);
+        LL_GPIO_ResetOutputPin(xshut_config[i].port, xshut_config[i].pin);
+    }
+    *xshut_pin = xshut_config;
+
     /*
      * Clock on the I2C peripheral and set it up
      */

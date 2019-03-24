@@ -3,7 +3,11 @@
 
 #include "stm32f051x8.h"
 #include "stm32f0xx_ll_gpio.h"
+#include "stm32f0xx_ll_system.h"
+#include "stm32f0xx_ll_exti.h"
 
+#define GPIO_GET(num)                       LL_GPIO_PIN_##num
+#define GPIO(num)                           GPIO_GET(num)
 /*
  * Communication with stm
  * UART1 pinout
@@ -37,21 +41,20 @@
 /*
  * Proximity sensors pins and I2C bus
  */
-#define COL_AV_XSHUT_PORT                   GPIOC
-#define COL_AV_XSHUT_PIN1                   LL_GPIO_PIN_0
-#define COL_AV_XSHUT_PIN2                   LL_GPIO_PIN_1
-#define COL_AV_XSHUT_PIN3                   LL_GPIO_PIN_2
-#define COL_AV_XSHUT_PIN4                   LL_GPIO_PIN_3
-#define COL_AV_XSHUT_PIN5                   LL_GPIO_PIN_6
-#define COL_AV_XSHUT_PIN6                   LL_GPIO_PIN_7
 
-#define COL_AV_INT_PORT                     GPIOB
-#define COL_AV_INT_PIN1                     LL_GPIO_PIN_0
-#define COL_AV_INT_PIN2                     LL_GPIO_PIN_1
-#define COL_AV_INT_PIN3                     LL_GPIO_PIN_2
-#define COL_AV_INT_PIN4                     LL_GPIO_PIN_3
-#define COL_AV_INT_PIN5                     LL_GPIO_PIN_4
-#define COL_AV_INT_PIN6                     LL_GPIO_PIN_5
+typedef struct {
+    GPIO_TypeDef *port;
+    uint32_t pin;
+} out_t;
+
+#define COL_AV_XSHUT_CONFIG { \
+    {GPIOC, LL_GPIO_PIN_0}, /* ID0 */ \
+    {GPIOC, LL_GPIO_PIN_1}, /* ID1 */ \
+    {GPIOC, LL_GPIO_PIN_2}, /* ID2 */ \
+    {GPIOC, LL_GPIO_PIN_3}, /* ID3 */ \
+    {GPIOC, LL_GPIO_PIN_6}, /* ID4 */ \
+    {GPIOC, LL_GPIO_PIN_7}, /* ID5 */ \
+}
 
 #define COL_AV_I2C_PORT                     GPIOB
 #define COL_AV_I2C_SCL                      LL_GPIO_PIN_6
