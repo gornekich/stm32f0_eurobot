@@ -102,12 +102,12 @@ gdb-server-st:
 OPENOCD_P=3333
 gdb-openocd: $(PROJECT).elf
 	$(GDB) --eval-command="target extended-remote localhost:$(OPENOCD_P)"\
-	       --eval-command="monitor halt" $(PROJECT).elf
+	       --eval-command="load" $(PROJECT).elf
 
 GDB_P=4242
 gdb-st-util: $(PROJECT).elf
 	$(GDB) --eval-command="target extended-remote localhost:$(GDB_P)"\
-	       --eval-command="monitor halt" $(PROJECT).elf
+	       --eval-command="load" $(PROJECT).elf
 
 $(PROJECT).elf: $(OBJS)
 
