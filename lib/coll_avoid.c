@@ -15,6 +15,7 @@
 #include "gpio_map.h"
 #include "display.h"
 #include "xprintf.h"
+#include "terminal.h"
 
 static col_avoid_ctrl_t col_avoid_ctrl[NUMBER_OF_PROX_SENSORS];
 
@@ -78,14 +79,50 @@ void fsm_coll_avoid_init(void *args)
 
 void fsm_coll_avoid_main(void *args)
 {
-    (void) args;
+        (void) args;
+        static int counter = 0;
+        static uint8_t prox_vals[3];
 
-    VL53L0X_RangingMeasurementData_t RangingMeasurementData;
+        counter = (counter + 1) % 20000;
+        if (counter)
+            return;
+        VL53L0X_RangingMeasurementData_t RangingMeasurementData;
 
-    VL53L0X_GetRangingMeasurementData(&GET_DEV_ID(0),
-                                      &RangingMeasurementData);
+        VL53L0X_GetRangingMeasurementData(&GET_DEV_ID(0),
+                                          &RangingMeasurementData);
+        disp_set_cursor(1, 4);
+        xprintf("d0: %d cm  ", RangingMeasurementData.RangeMilliMeter/10);
+        if (RangingMeasurementData.RangeMilliMeter/10 > 255)
+                prox_vals[0] = 255;
+        else
+                prox_vals[0] = RangingMeasurementData.RangeMilliMeter/10;
 
-    VL53L0X_ClearInterruptMask(&GET_DEV_ID(0),
-        VL53L0X_REG_SYSTEM_INTERRUPT_GPIO_NEW_SAMPLE_READY);
-    return;
+        VL53L0X_ClearInterruptMask(&GET_DEV_ID(0),
+                          VL53L0X_REG_SYSTEM_INTERRUPT_GPIO_NEW_SAMPLE_READY);
+        VL53L0X_GetRangingMeasurementData(&GET_DEV_ID(1),
+                                          &RangingMeasurementData);
+        disp_set_cursor(1, 5);
+        xprintf("d1: %dcm", RangingMeasurementData.RangeMilliMeter/10);
+        if (RangingMeasurementData.RangeMilliMeter/10 > 255)
+                prox_vals[1] = 255;
+        else
+                prox_vals[1] = RangingMeasurementData.RangeMilliMeter/10;
+
+        VL53L0X_ClearInterruptMask(&GET_DEV_ID(1),
+                          VL53L0X_REG_SYSTEM_INTERRUPT_GPIO_NEW_SAMPLE_READY);
+
+        VL53L0X_GetRangingMeasurementData(&GET_DEV_ID(2),
+                                          &RangingMeasurementData);
+        disp_set_cursor(10, 5);
+        xprintf("d2: %dcm ", RangingMeasurementData.RangeMilliMeter/10);
+        if (RangingMeasurementData.RangeMilliMeter/10 > 255)
+                prox_vals[2] = 255;
+        else
+                prox_vals[2] = RangingMeasurementData.RangeMilliMeter/10;
+
+        VL53L0X_ClearInterruptMask(&GET_DEV_ID(2),
+                          VL53L0X_REG_SYSTEM_INTERRUPT_GPIO_NEW_SAMPLE_READY);
+        comm_send_msg(prox_vals, 3);
+        disp_update();
+        return;
 }

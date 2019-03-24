@@ -2,6 +2,6 @@
 #define _DEV_MAP_H_
 
 #define NUMBER_OF_DYNAMIXELS            3
-#define NUMBER_OF_PROX_SENSORS          1
+#define NUMBER_OF_PROX_SENSORS          3
 
 #endif //_DEV_MAP_H_
