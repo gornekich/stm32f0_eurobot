@@ -24,6 +24,13 @@ typedef struct {
         } \
         (void) iter;
 
+#define WITH_CA_CTRL(gen_struct, ca_ctrl, id) \
+        col_avoid_ctrl_t *ca_ctrl = &gen_struct[id]; {
+
+#define END_WITH_CA_CTRL(ca_ctrl) \
+        } \
+        (void) ca_ctrl;
+
 #define CA_DEF_ADDR 0x52
 #define CA_ADDR_DIST 0x5
 

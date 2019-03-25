@@ -56,6 +56,7 @@ void VL53L0X_hw_config(const out_t **xshut_pin) {
      * Clock on the I2C peripheral and set it up
      */
     LL_RCC_SetI2CClockSource(LL_RCC_I2C1_CLKSOURCE_SYSCLK);
+    LL_I2C_Disable(COL_AV_I2C);
     LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_I2C1);
     LL_I2C_DisableAnalogFilter(COL_AV_I2C);
     LL_I2C_SetDigitalFilter(COL_AV_I2C, 1);
@@ -64,6 +65,11 @@ void VL53L0X_hw_config(const out_t **xshut_pin) {
     LL_I2C_SetMasterAddressingMode(COL_AV_I2C, COL_AV_I2C_ADDR_MODE);
     LL_I2C_SetMode(COL_AV_I2C, COL_AV_I2C_MODE);
     LL_I2C_Enable(COL_AV_I2C);
+
+    LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_GPIOC);
+    LL_GPIO_SetPinMode(GPIOC, LL_GPIO_PIN_8, LL_GPIO_MODE_OUTPUT);
+    LL_GPIO_SetPinMode(GPIOC, LL_GPIO_PIN_9, LL_GPIO_MODE_OUTPUT);
+
     return;
 }
 
@@ -71,8 +77,8 @@ VL53L0X_Error VL53L0X_WriteMulti(VL53L0X_DEV Dev, uint8_t index,
                                  uint8_t *pdata, uint32_t count)
 {
     uint8_t i;
+    int32_t timeout = I2C_IO_TIMEOUT;
 
-    //xprintf("WriteMulti in (byte: %d)\n", count);
     /*
      * Init transmit and set all params
      */
@@ -82,19 +88,25 @@ VL53L0X_Error VL53L0X_WriteMulti(VL53L0X_DEV Dev, uint8_t index,
     /*
      * Wait till I2C is ready to transmit and send address of reg
      */
-    while (!LL_I2C_IsActiveFlag_TXIS(COL_AV_I2C));
+    while (!LL_I2C_IsActiveFlag_TXIS(COL_AV_I2C) && (timeout-- > 0));
+    if (timeout <= 0)
+        return VL53L0X_ERROR_TIME_OUT;
     LL_I2C_TransmitData8(COL_AV_I2C, index);
     /*
      * Send all data to slave waiting for TXIS on each step
      */
     for (i = 0; i < count; i++) {
-        while (!LL_I2C_IsActiveFlag_TXIS(COL_AV_I2C));
+        while (!LL_I2C_IsActiveFlag_TXIS(COL_AV_I2C) && (timeout-- > 0));
+        if (timeout <= 0)
+            return VL53L0X_ERROR_TIME_OUT;
         LL_I2C_TransmitData8(COL_AV_I2C, pdata[i]);
     }
     /*
      * Check for end of transmission
      */
-    while (LL_I2C_IsActiveFlag_TC(COL_AV_I2C));
+    while (LL_I2C_IsActiveFlag_TC(COL_AV_I2C) && (timeout-- > 0));
+    if (timeout <= 0)
+        return VL53L0X_ERROR_TIME_OUT;
 
     return VL53L0X_ERROR_NONE;
 }
@@ -103,22 +115,13 @@ VL53L0X_Error VL53L0X_ReadMulti(VL53L0X_DEV Dev, uint8_t index,
                                 uint8_t *pdata, uint32_t count)
 {
     uint8_t i;
+    int32_t timeout = I2C_IO_TIMEOUT;
 
     /*
      * Init transmit of register address
      */
-    LL_I2C_HandleTransfer(COL_AV_I2C, Dev->I2cDevAddr, LL_I2C_ADDRSLAVE_7BIT,
-                          1, LL_I2C_MODE_AUTOEND,
-                          LL_I2C_GENERATE_START_WRITE);
-    /*
-     * Wait till I2C is ready to transmit and send reg address
-     */
-    while (!LL_I2C_IsActiveFlag_TXIS(COL_AV_I2C));
-    LL_I2C_TransmitData8(COL_AV_I2C, index);
-    /*
-     * Check for end of transmission
-     */
-    while (LL_I2C_IsActiveFlag_TC(COL_AV_I2C));
+    if (VL53L0X_WriteMulti(Dev, index, NULL, 0) == VL53L0X_ERROR_TIME_OUT)
+        return VL53L0X_ERROR_TIME_OUT;
     /*
      * Init reading of package size of count
      */
@@ -129,13 +132,17 @@ VL53L0X_Error VL53L0X_ReadMulti(VL53L0X_DEV Dev, uint8_t index,
      * Receive all data from the slave
      */
     for (i = 0; i < count; i++) {
-        while (!LL_I2C_IsActiveFlag_RXNE(COL_AV_I2C));
+        while (!LL_I2C_IsActiveFlag_RXNE(COL_AV_I2C) && (timeout-- > 0));
+        if (timeout <= 0)
+            return VL53L0X_ERROR_TIME_OUT;
         pdata[i] = LL_I2C_ReceiveData8(COL_AV_I2C);
     }
     /*
-     * Check for end of receiving
+     * Check if it is the end of receiving
      */
-    while (LL_I2C_IsActiveFlag_TC(COL_AV_I2C));
+    while (LL_I2C_IsActiveFlag_TC(COL_AV_I2C) && (timeout-- > 0));
+    if (timeout <= 0)
+        return VL53L0X_ERROR_TIME_OUT;
 
     return VL53L0X_ERROR_NONE;
 }
@@ -208,7 +215,7 @@ VL53L0X_Error VL53L0X_RdDWord(VL53L0X_DEV Dev, uint8_t index, uint32_t *data)
 VL53L0X_Error VL53L0X_PollingDelay(VL53L0X_DEV Dev)
 {
     (void) Dev;
-    uint32_t count = 10000;
+    uint32_t count = 5000;
 
     while (count--);
     return VL53L0X_ERROR_NONE;
