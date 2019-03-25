@@ -7,6 +7,7 @@
 #include "stm32f0xx_ll_system.h"
 #include "stm32f0xx_ll_bus.h"
 #include <stdlib.h>
+#include "terminal.h"
 
 /*
  * Private variable for err_manager control
@@ -84,6 +85,15 @@ void err_man_update_col_av_status(uint8_t id, uint8_t status)
 }
 
 /*
+ * Public function for storing distance
+ */
+void err_man_set_dist(uint8_t id, uint8_t dist)
+{
+    err_ctrl.col_av_dist[id] = dist;
+    return;
+}
+
+/*
  * Configure timer to counter mode
  */
 static void tim_init(void)
@@ -147,5 +157,6 @@ void fsm_err_man_show_err(void *args)
 void TIM2_IRQHandler(void)
 {
     err_ctrl.disp_update = 1;
+    comm_send_msg(err_ctrl.col_av_dist, NUMBER_OF_PROX_SENSORS);
     LL_TIM_ClearFlag_UPDATE(TIM2);
 }

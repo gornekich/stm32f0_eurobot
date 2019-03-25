@@ -15,10 +15,12 @@ typedef struct {
         uint8_t col_av_err_flags;
         uint8_t dyn_err_status[NUMBER_OF_DYNAMIXELS];
         uint8_t col_av_err_status[NUMBER_OF_PROX_SENSORS];
+        uint8_t col_av_dist[NUMBER_OF_PROX_SENSORS];
         uint8_t disp_update;
 } err_ctrl_t;
 
 void err_man_update_dyn_status(uint8_t id, uint8_t status);
 void err_man_update_col_av_status(uint8_t id, uint8_t status);
+void err_man_set_dist(uint8_t id, uint8_t dist);
 
 #endif //_ERR_MANAGER_H_

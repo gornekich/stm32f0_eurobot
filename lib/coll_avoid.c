@@ -133,6 +133,7 @@ void fsm_coll_avoid_main(void *args)
         }
         else {
             err_man_update_col_av_status(i, 0);
+            err_man_set_dist(i, dist);
         }
     }
     fsm_set_data(FSM_TERM_MAIN, (void *) UPDATE_DISPLAY);
