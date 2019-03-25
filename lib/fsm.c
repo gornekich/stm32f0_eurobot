@@ -90,6 +90,7 @@ int is_state_shadow(fsm_ctrl_t *fsm_ctrl, uint32_t state)
 void fsm_state_mng(void)
 {
         int next_shadow = 0;
+        static int max_state = 0;
 
         /*
          * Handle first call
@@ -99,6 +100,14 @@ void fsm_state_mng(void)
         if (fsm_ctrl.sleep_state == LOWER_BOUND_CASE) {
                 fsm_ctrl.sleep_state = fsm_ctrl.shadow_state[0];
                 fast_swap(&(fsm_ctrl.sleep_state), &(fsm_ctrl.state));
+                return;
+        }
+        /*
+         * Every 10 switches allow shadow state to be executed
+         */
+        if ((next_shadow = is_state_shadow(&fsm_ctrl, fsm_ctrl.state)) == -1) {
+            max_state = (max_state + 1) % 10;
+            if (max_state != 0)
                 return;
         }
         /*

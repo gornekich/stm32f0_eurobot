@@ -67,10 +67,10 @@ static void disp_hw_config(void)
 /*
  * Reset display
  */
-static void disp_reset(void)
+void disp_reset(void)
 {
         int i = RESET_DELAY;
-        
+
         LL_GPIO_ResetOutputPin(DISP_RESET_PORT, DISP_RESET_PIN);
         while (--i);
         LL_GPIO_SetOutputPin(DISP_RESET_PORT, DISP_RESET_PIN);
@@ -167,7 +167,7 @@ int disp_write_char(char ch)
                 b = disp_font7x10[(ch - 32) * FONT_HEIGHT + i];
                 for (j = 0; j < FONT_WIDTH; j++) {
                         if ((b << j) & 0x8000) {
-                                disp_draw_pix(disp_ctrl.cur_x + j, 
+                                disp_draw_pix(disp_ctrl.cur_x + j,
                                               disp_ctrl.cur_y + i,
                                               (disp_color) WHITE);
                         } else {

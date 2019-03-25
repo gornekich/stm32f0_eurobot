@@ -8,6 +8,16 @@
 #define TERM_CMD_LENGTH         10
 
 /*
+ * Input requests for terminal FSM state
+ * Any shadow FSM state may send one of the belisted commands
+ * to terminal (using set_data mechanism)
+ */
+enum TERMINAL_REQUESTS {
+    NONE           = 0x00,
+    UPDATE_DISPLAY = 0x01
+};
+
+/*
  * Checking input command code
  */
 #define IS_COMMAND_VALID(com)   (((com) > LOWER_BOUND_CASE) && \

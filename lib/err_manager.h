@@ -4,17 +4,18 @@
 #include <stdint.h>
 #include "dev_map.h"
 
-#define add_err_flag(flag, n) \
-        flag |= (0x01 << ((id) - 1))
+#define add_err_flag(flag, n, status) \
+        flag = ((status << n) | (flag & ~(0x1 << n)))
 
 #define get_err_flag(flag, n) \
-        (((flag) >> ((n) - 1)) & 0x01)
+        (((flag) >> (n)) & 0x01)
 
 typedef struct {
         uint8_t dyn_err_flags;
         uint8_t col_av_err_flags;
         uint8_t dyn_err_status[NUMBER_OF_DYNAMIXELS];
         uint8_t col_av_err_status[NUMBER_OF_PROX_SENSORS];
+        uint8_t disp_update;
 } err_ctrl_t;
 
 void err_man_update_dyn_status(uint8_t id, uint8_t status);
