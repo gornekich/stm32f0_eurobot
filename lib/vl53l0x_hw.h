@@ -4,6 +4,8 @@
 #include "vl53l0x_def.h"
 #include "gpio_map.h"
 
+#define I2C_IO_TIMEOUT 1000
+
 void VL53L0X_hw_config(const out_t **xshut_pin);
 
 /**
