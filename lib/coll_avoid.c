@@ -6,6 +6,7 @@
 #include "stm32f0xx_ll_system.h"
 #include "stm32f0xx_ll_usart.h"
 #include "stm32f0xx_ll_i2c.h"
+#include "stm32f0xx_ll_tim.h"
 
 #include "fsm.h"
 
@@ -127,10 +128,14 @@ void fsm_coll_avoid_main(void *args)
 
     for (i = 0; i < NUMBER_OF_PROX_SENSORS; i++) {
         dist = get_dist(i);
-        if (dist == -1)
-            err_man_update_col_av_status(i, 0);
-        else
+        if (dist == -1) {
             err_man_update_col_av_status(i, 1);
+        }
+        else {
+            err_man_update_col_av_status(i, 0);
+            err_man_set_dist(i, dist);
+        }
     }
+    fsm_set_data(FSM_TERM_MAIN, (void *) UPDATE_DISPLAY);
     return;
 }
