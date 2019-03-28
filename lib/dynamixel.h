@@ -15,6 +15,7 @@
 typedef struct {
         uint8_t id;
         uint16_t angle;
+        uint16_t speed;
 }__attribute__((packed)) dyn_set_angle_t;
 
 /*

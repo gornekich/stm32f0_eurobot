@@ -82,7 +82,7 @@ void fsm_coll_avoid_init(void *args)
 
     reset_sensors();
     fsm_add_shadow_state(FSM_COLL_AVOID_MAIN);
-    fsm_set_state(FSM_TERM_MAIN);
+    fsm_set_state(FSM_ERR_MAN_SHOW_ERR);
     return;
 }
 

@@ -148,7 +148,7 @@ void fsm_err_man_show_err(void *args)
     err_man_show_err();
     if (err_ctrl.disp_update == 1)
         fsm_set_data(FSM_TERM_MAIN, NULL);
-    fsm_set_state(FSM_TERM_MAIN);
+    fsm_set_state(FSM_ERR_MAN_SHOW_ERR);
 }
 
 /*

@@ -203,6 +203,21 @@ void fsm_dynamixel_init(void *args)
         return;
 }
 
+static void dyn_set_speed(uint8_t id, uint16_t speed)
+{
+        /*
+         * Make new packet
+         */
+        static const uint8_t DYN_SET_ANGLE_CMD_LEN = 9;
+        uint8_t highByte = (uint8_t)((speed >> 8) & 0xff);
+        uint8_t lowByte = (uint8_t)(speed & 0xff);
+        uint8_t crc = id + 0x05 + 0x03 + 0x20 + lowByte + highByte;
+        uint8_t tx[] = {0xff, 0xff, id, 0x05, 0x03, 0x20, lowByte,
+                               highByte, ~crc};
+
+        dyn_send_cmd(tx, DYN_SET_ANGLE_CMD_LEN);
+}
+
 /*
  * Terminal commands implementation
  */
@@ -232,6 +247,7 @@ void fsm_dyn_set_angle(void *args)
         // if (is_dyn_flag_set(dyn_ctrl, RX_COMPLETE))
         //         return;
         LL_GPIO_TogglePin(GPIOC, LL_GPIO_PIN_9);
+        //dyn_set_speed(cmd_args->id, cmd_args->speed);
         dyn_send_cmd(tx, DYN_SET_ANGLE_CMD_LEN);
         fsm_set_state(FSM_TERM_MAIN);
 set_angle_error:

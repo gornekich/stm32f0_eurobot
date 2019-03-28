@@ -163,10 +163,19 @@ void fsm_term_cmd_start(void *args)
  */
 void DMA1_Channel4_5_IRQHandler(void)
 {
+    uint8_t command_code = 0x00;
+
     if (LL_DMA_IsActiveFlag_TC5(TERM_DMA)) {
         LL_DMA_ClearFlag_TC5(TERM_DMA);
         LL_DMA_ClearFlag_HT5(TERM_DMA);
         LL_DMA_EnableChannel(TERM_DMA, TERM_DMA_CHANNEL);
-        term_set_flag(term_ctrl, RX_COMPLETE);
+        command_code = term_ctrl.channel[0];
+        if (IS_COMMAND_VALID(command_code) &&
+            fsm_states_handlers[command_code] != NULL) {
+            memcpy(term_ctrl.params, &term_ctrl.channel[1],
+                   TERM_CMD_LENGTH - 1);
+        fsm_dyn_set_angle((void *)term_ctrl.params);
+        }
+        //term_set_flag(term_ctrl, RX_COMPLETE);
     }
 }
