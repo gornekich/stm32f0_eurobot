@@ -111,7 +111,7 @@ static void tim_init(void)
      * Setup NVIC
      */
     NVIC_EnableIRQ(TIM2_IRQn);
-    NVIC_SetPriority(TIM2_IRQn, 0);
+    NVIC_SetPriority(TIM2_IRQn, 4);
     return;
 }
 /*

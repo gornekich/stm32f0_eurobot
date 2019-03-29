@@ -203,6 +203,12 @@ void fsm_dynamixel_init(void *args)
         return;
 }
 
+static void dyn_delay(uint32_t i)
+{
+        while(i--);
+        return;
+}
+
 static void dyn_set_speed(uint8_t id, uint16_t speed)
 {
         /*
@@ -216,6 +222,8 @@ static void dyn_set_speed(uint8_t id, uint16_t speed)
                                highByte, ~crc};
 
         dyn_send_cmd(tx, DYN_SET_ANGLE_CMD_LEN);
+        dyn_delay(48000000/1000);
+        return;
 }
 
 /*
@@ -247,7 +255,8 @@ void fsm_dyn_set_angle(void *args)
         // if (is_dyn_flag_set(dyn_ctrl, RX_COMPLETE))
         //         return;
         LL_GPIO_TogglePin(GPIOC, LL_GPIO_PIN_9);
-        //dyn_set_speed(cmd_args->id, cmd_args->speed);
+        if (cmd_args->speed != 0)
+            dyn_set_speed(cmd_args->id, cmd_args->speed);
         dyn_send_cmd(tx, DYN_SET_ANGLE_CMD_LEN);
         fsm_set_state(FSM_TERM_MAIN);
 set_angle_error:
