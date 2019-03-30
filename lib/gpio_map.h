@@ -27,6 +27,12 @@
 #define DYNAMIXEL_USART_PIN_AF              LL_GPIO_AF_1
 
 /*
+ * Dynamixels reset pin
+ */
+#define DYN_RESET_PORT                      GPIOC
+#define DYN_RESET_PIN                       LL_GPIO_PIN_6
+
+/*
  * Display pins
  */
 #define DISP_RESET_PORT                     GPIOC

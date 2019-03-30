@@ -178,6 +178,15 @@ void fsm_dynamixel_init(void *args)
         LL_DMA_EnableChannel(DYNAMIXEL_DMA_RX, DYNAMIXEL_DMA_RX_CHANNEL);
         LL_USART_Enable(DYNAMIXEL_USART);
         //LL_TIM_EnableCounter(DYNAMIXEL_TIMER);
+
+        /*
+         * Configure reset pin
+         */
+        LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_GPIOC);
+        LL_GPIO_SetPinMode(DYN_RESET_PORT, DYN_RESET_PIN, LL_GPIO_MODE_OUTPUT);
+        LL_GPIO_SetPinOutputType(DYN_RESET_PORT, DYN_RESET_PIN,
+                                 LL_GPIO_OUTPUT_OPENDRAIN);
+        LL_GPIO_SetOutputPin(DYN_RESET_PORT, DYN_RESET_PIN);
         /*
          * Clear rx complete flag
          */
@@ -194,7 +203,9 @@ void fsm_dynamixel_init(void *args)
          */
         LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_GPIOC);
         LL_GPIO_SetPinMode(GPIOC, LL_GPIO_PIN_9, LL_GPIO_MODE_OUTPUT);
+        LL_GPIO_SetPinMode(GPIOC, LL_GPIO_PIN_8, LL_GPIO_MODE_OUTPUT);
         LL_GPIO_SetPinOutputType(GPIOC, LL_GPIO_PIN_9, LL_GPIO_OUTPUT_PUSHPULL);
+        LL_GPIO_SetPinOutputType(GPIOC, LL_GPIO_PIN_8, LL_GPIO_OUTPUT_PUSHPULL);
 
         /*
          * Switch to init collision avoidance
@@ -202,6 +213,11 @@ void fsm_dynamixel_init(void *args)
         fsm_set_state(FSM_ERR_MAN_INIT);
         return;
 }
+
+// static void dyn_reset(void)
+// {
+//         LL_GPIO_ResetOutputPin(DYN_RESET_PORT, DYN_RESET_PIN);
+// }
 
 static void dyn_delay(uint32_t i)
 {
@@ -226,6 +242,17 @@ static void dyn_set_speed(uint8_t id, uint16_t speed)
         return;
 }
 
+static void dyn_disable_torque(void)
+{
+        static const uint8_t DYN_DISABLE_TORQUE_CMD_LEN = 8;
+        uint8_t crc = 0xfe + 0x04 + 0x03 + 0x18 + 0x00;
+        uint8_t tx[] = {0xff, 0xff, 0xfe, 0x04, 0x03, 0x18, 0x00,
+                                ~crc};
+        dyn_send_cmd(tx, DYN_DISABLE_TORQUE_CMD_LEN);
+        dyn_delay(48000000/1000);
+        return;
+}
+
 /*
  * Terminal commands implementation
  */
@@ -241,6 +268,14 @@ void fsm_dyn_set_angle(void *args)
         uint8_t crc = cmd_args->id + 0x05 + 0x03 + 0x1e + lowByte + highByte;
         uint8_t tx[] = {0xff, 0xff, cmd_args->id, 0x05, 0x03, 0x1e, lowByte,
                                highByte, ~crc};
+
+        if (cmd_args->id == 255 && cmd_args->angle == 0){
+                //dyn_reset();
+                dyn_disable_torque();
+                LL_GPIO_TogglePin(GPIOC, LL_GPIO_PIN_8);
+                fsm_set_state(FSM_ERR_MAN_SHOW_ERR);
+                return;
+        }
 
         if (cmd_args->angle > DYN_MAX_ANGLE)
                 goto set_angle_error;
@@ -258,9 +293,9 @@ void fsm_dyn_set_angle(void *args)
         if (cmd_args->speed != 0)
             dyn_set_speed(cmd_args->id, cmd_args->speed);
         dyn_send_cmd(tx, DYN_SET_ANGLE_CMD_LEN);
-        fsm_set_state(FSM_TERM_MAIN);
+        fsm_set_state(FSM_ERR_MAN_SHOW_ERR);
 set_angle_error:
-        fsm_set_state(FSM_TERM_MAIN);
+        fsm_set_state(FSM_ERR_MAN_SHOW_ERR);
         return;
 }
 
