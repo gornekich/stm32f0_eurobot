@@ -3,6 +3,13 @@
 
 #include "vl53l0x_api.h"
 #include "vl53l0x_hw.h"
+#include "dev_map.h"
+
+typedef struct {
+        uint8_t dist[NUMBER_OF_PROX_SENSORS];
+        uint8_t status;
+        uint8_t block;
+} col_av_data_t;
 
 typedef struct {
         VL53L0X_Dev_t MyDevice;
@@ -33,5 +40,21 @@ typedef struct {
 
 #define CA_DEF_ADDR 0x52
 #define CA_ADDR_DIST 0x5
+
+/*
+ * Public functions
+ */
+void reset_sensors(void);
+void reset_sensor(uint8_t id);
+void coll_avoid_init(void);
+
+uint8_t col_av_read_status(void);
+void col_av_set_status(uint8_t id);
+void col_av_clr_status(uint8_t id);
+uint8_t col_av_get_status(uint8_t id);
+
+uint8_t col_av_get_block(void);
+void col_av_clr_block(void);
+void col_av_set_block(void);
 
 #endif

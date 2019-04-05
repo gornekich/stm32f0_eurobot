@@ -1,7 +1,7 @@
 #include "terminal.h"
-#include "fsm.h"
 #include "peripheral.h"
 #include "gpio_map.h"
+#include "dynamixel.h"
 
 #include "stm32f0xx_ll_rcc.h"
 #include "stm32f0xx_ll_bus.h"
@@ -17,13 +17,8 @@ static term_ctrl_t term_ctrl;
  * Init all periphs related to terminal communication, like
  * UART and all static structures related
  */
-void fsm_term_init(void *args)
+void term_init(void)
 {
-    (void) args;
-    /*
-     * Reset all flags
-     */
-    term_ctrl.flags = 0x00;
     /*
      * Setting USART pins
      */
@@ -86,17 +81,8 @@ void fsm_term_init(void *args)
      */
     LL_USART_Enable(TERM_USART);
     LL_DMA_EnableChannel(TERM_DMA, TERM_DMA_CHANNEL);
-
-    fsm_set_state(FSM_COLL_AVOID_INIT);
     return;
 }
-
-/*
- * Here all commands coming from stm32f4 should be processed
- * and then corresponding handler called
- * Example: if some command is requested then fsm_set_state to its
- * corresponding handler
- */
 
 void comm_send_msg(uint8_t *buff, int len)
 {
@@ -111,71 +97,16 @@ void comm_send_msg(uint8_t *buff, int len)
     return;
 }
 
-void fsm_term_main(void *args)
-{
-    (void) args;
-    uint8_t command_code = 0x00;
-    uint32_t request = (uint32_t) args;
-
-    /*
-     * Process input comamnds
-     */
-    if (is_term_flag_set(term_ctrl, RX_COMPLETE)) {
-        term_clr_flag(term_ctrl, RX_COMPLETE);
-        command_code = term_ctrl.channel[0];
-        if (IS_COMMAND_VALID(command_code) &&
-            fsm_states_handlers[command_code] != NULL) {
-            memcpy(term_ctrl.params, &term_ctrl.channel[1],
-                   TERM_CMD_LENGTH - 1);
-            fsm_set_data(command_code + FSM_TERM_CMD_START,
-                         (void *)term_ctrl.params);
-            fsm_set_state(command_code + FSM_TERM_CMD_START);
-            return;
-        }
-    }
-
-    /*
-     * Process input requests
-     */
-    switch (request) {
-    case UPDATE_DISPLAY:
-        fsm_set_state(FSM_ERR_MAN_SHOW_ERR);
-        break;
-    default:
-        fsm_set_data(FSM_TERM_MAIN, NULL);
-        break;
-    }
-    return;
-}
-
-/*
- * Implementation of term_handlers_start function
- */
-void fsm_term_cmd_start(void *args)
-{
-    (void) args;
-
-    return;
-}
-
 /*
  * DMA hardware interrupt handler
  */
 void DMA1_Channel4_5_IRQHandler(void)
 {
-    uint8_t command_code = 0x00;
-
     if (LL_DMA_IsActiveFlag_TC5(TERM_DMA)) {
         LL_DMA_ClearFlag_TC5(TERM_DMA);
-        LL_DMA_ClearFlag_HT5(TERM_DMA);
         LL_DMA_EnableChannel(TERM_DMA, TERM_DMA_CHANNEL);
-        command_code = term_ctrl.channel[0];
-        if (IS_COMMAND_VALID(command_code) &&
-            fsm_states_handlers[command_code] != NULL) {
-            memcpy(term_ctrl.params, &term_ctrl.channel[1],
+        memcpy(term_ctrl.params, &term_ctrl.channel[1],
                    TERM_CMD_LENGTH - 1);
-        fsm_dyn_set_angle((void *)term_ctrl.params);
-        }
-        //term_set_flag(term_ctrl, RX_COMPLETE);
+        dyn_set_angle((void *)term_ctrl.params);
     }
 }

@@ -2,7 +2,10 @@
 #include "stm32f0xx_ll_gpio.h"
 #include "stm32f0xx_ll_rcc.h"
 #include "stm32f0xx_ll_system.h"
-#include "fsm.h"
+
+#include "terminal.h"
+#include "err_manager.h"
+#include "coll_avoid.h"
 
 /**
   * System Clock Configuration
@@ -45,40 +48,30 @@ static void rcc_config(void)
         SystemCoreClock = 48000000;
 }
 
-/*
- * First function to be called from fsm
- */
-void fsm_global_init(void *args)
-{
-        (void) args;
-
-        fsm_set_state(FSM_DYNAMIXEL_INIT);
-        return;
-}
-
-/*
- * Handler for internal fsm errors, like wrong requests
- */
-void fsm_error(void *args)
-{
-        (void) args;
-
-        return;
-}
-
-/*
- * ALL NECESSARY OPERATIONS SHOULD BE DONE IN CORRESPONDING
- *                      STATES OF FSM
- *                   !DO NOT CHANGE MAIN!
- */
 int main(void)
 {
-        rcc_config();
-        fsm_init();
+        uint8_t col_av_status = 0;
+        uint8_t cur_id = 0;
+        uint8_t err_man_status;
 
+        rcc_config();
+        term_init();
+        coll_avoid_init();
+        err_man_init();
         while (1) {
-                fsm_run_state();
-                fsm_state_mng();
+                col_av_status = col_av_read_status();
+                if (col_av_status) {
+                        col_av_set_block();
+                        while (col_av_status >> 1 && cur_id++);
+                        //reset_sensor(cur_id);
+                        col_av_clr_status(cur_id);
+                        col_av_clr_block();
+                }
+                err_man_status = er_man_disp_get();
+                if (err_man_status) {
+                        err_man_show_err();
+                        er_man_disp_clr();
+                }
         }
         return 0;
 }

@@ -2,7 +2,6 @@
 #include <string.h>
 
 #include "display.h"
-#include "fsm.h"
 #include "peripheral.h"
 #include "gpio_map.h"
 #include "xprintf.h"
