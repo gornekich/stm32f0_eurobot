@@ -66,10 +66,6 @@ void VL53L0X_hw_config(const out_t **xshut_pin) {
     LL_I2C_SetMode(COL_AV_I2C, COL_AV_I2C_MODE);
     LL_I2C_Enable(COL_AV_I2C);
 
-    LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_GPIOC);
-    LL_GPIO_SetPinMode(GPIOC, LL_GPIO_PIN_8, LL_GPIO_MODE_OUTPUT);
-    LL_GPIO_SetPinMode(GPIOC, LL_GPIO_PIN_9, LL_GPIO_MODE_OUTPUT);
-
     return;
 }
 
