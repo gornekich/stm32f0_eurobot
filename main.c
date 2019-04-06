@@ -66,6 +66,7 @@ int main(void)
             //reset_sensor(cur_id);
             col_av_clr_status(cur_id);
             col_av_clr_block();
+            cur_id = 0;
         }
         err_man_status = er_man_disp_get();
         if (err_man_status) {

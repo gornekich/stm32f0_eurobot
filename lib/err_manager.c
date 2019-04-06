@@ -19,7 +19,7 @@ static void tim_init(void)
     /*
      * Setup timer
      */
-    LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_TIM2);
+    LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_TIM3);
     LL_TIM_SetPrescaler(ERROR_MAN_TIM, ERROR_MAN_TIM_PSC);
     LL_TIM_SetAutoReload(ERROR_MAN_TIM, ERROR_MAN_TIM_RELOAD);
     LL_TIM_SetCounterMode(ERROR_MAN_TIM, ERROR_MAN_TIM_MODE);

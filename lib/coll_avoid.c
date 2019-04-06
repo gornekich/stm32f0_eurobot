@@ -106,11 +106,13 @@ void reset_sensor(uint8_t id)
     /*
      * Turn on the sensor
      */
+    LL_GPIO_ResetOutputPin(xshut_pin[id].port, xshut_pin[id].pin);
+    VL53L0X_PollingDelay(&GET_DEV(ca_ctrl));
     LL_GPIO_SetOutputPin(xshut_pin[id].port, xshut_pin[id].pin);
+    VL53L0X_PollingDelay(&GET_DEV_ID(id));
     /*
      * Save params for interrupt pin
      */
-    VL53L0X_PollingDelay(&GET_DEV_ID(id));
     /*
      * Assign default address and do init procedure
      */
