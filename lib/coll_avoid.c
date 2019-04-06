@@ -101,45 +101,45 @@ void reset_sensors(void)
 
 void reset_sensor(uint8_t id)
 {
-        VL53L0X_Error status;
+    VL53L0X_Error status;
 
-        /*
-         * Turn on the sensor
-         */
-        LL_GPIO_SetOutputPin(xshut_pin[id].port, xshut_pin[id].pin);
-        /*
-         * Save params for interrupt pin
-         */
-        VL53L0X_PollingDelay(&GET_DEV_ID(id));
-        /*
-         * Assign default address and do init procedure
-         */
-        GET_DEV_ID(id).I2cDevAddr = CA_DEF_ADDR;
-        status = VL53L0X_DataInit(&GET_DEV_ID(id));
-        if (status != VL53L0X_ERROR_NONE) {
-            return;
-        }
-        VL53L0X_StaticInit(&GET_DEV_ID(id));
-        VL53L0X_PerformRefCalibration(&GET_DEV_ID(id),
-            &col_avoid_ctrl[id].vhv_settings,
-            &col_avoid_ctrl[id].phase_cal);
-        VL53L0X_PerformRefSpadManagement(&GET_DEV_ID(id),
-            &col_avoid_ctrl[id].ref_spad_count,
-            &col_avoid_ctrl[id].is_aperture_spads);
-        VL53L0X_SetDeviceMode(&GET_DEV_ID(id),
-            VL53L0X_DEVICEMODE_CONTINUOUS_RANGING);
-        /*
-         * Now change default address of sensor and
-         * distance between two neighbouring sensors is
-         * CA_ADDR_DIST
-         */
-        VL53L0X_SetDeviceAddress(&GET_DEV_ID(id), id * CA_ADDR_DIST);
-        GET_DEV_ID(id).I2cDevAddr = id * CA_ADDR_DIST;
-        /*
-         * Start measurement
-         */
-        VL53L0X_StartMeasurement(&GET_DEV_ID(id));
+    /*
+     * Turn on the sensor
+     */
+    LL_GPIO_SetOutputPin(xshut_pin[id].port, xshut_pin[id].pin);
+    /*
+     * Save params for interrupt pin
+     */
+    VL53L0X_PollingDelay(&GET_DEV_ID(id));
+    /*
+     * Assign default address and do init procedure
+     */
+    GET_DEV_ID(id).I2cDevAddr = CA_DEF_ADDR;
+    status = VL53L0X_DataInit(&GET_DEV_ID(id));
+    if (status != VL53L0X_ERROR_NONE) {
         return;
+    }
+    VL53L0X_StaticInit(&GET_DEV_ID(id));
+    VL53L0X_PerformRefCalibration(&GET_DEV_ID(id),
+        &col_avoid_ctrl[id].vhv_settings,
+        &col_avoid_ctrl[id].phase_cal);
+    VL53L0X_PerformRefSpadManagement(&GET_DEV_ID(id),
+        &col_avoid_ctrl[id].ref_spad_count,
+        &col_avoid_ctrl[id].is_aperture_spads);
+    VL53L0X_SetDeviceMode(&GET_DEV_ID(id),
+        VL53L0X_DEVICEMODE_CONTINUOUS_RANGING);
+    /*
+     * Now change default address of sensor and
+     * distance between two neighbouring sensors is
+     * CA_ADDR_DIST
+     */
+    VL53L0X_SetDeviceAddress(&GET_DEV_ID(id), id * CA_ADDR_DIST);
+    GET_DEV_ID(id).I2cDevAddr = id * CA_ADDR_DIST;
+    /*
+     * Start measurement
+     */
+    VL53L0X_StartMeasurement(&GET_DEV_ID(id));
+    return;
 }
 
 void coll_avoid_init(void)

@@ -12,13 +12,13 @@
 extern const uint16_t disp_font7x10[];
 
 typedef enum {
-        BLACK = 0x00,
-        WHITE = 0x01
+    BLACK = 0x00,
+    WHITE = 0x01
 } disp_color;
 
 typedef struct {
-        uint8_t cur_x;
-        uint8_t cur_y;
+    uint8_t cur_x;
+    uint8_t cur_y;
 } disp_ctrl_t;
 
 void disp_fill(disp_color color);

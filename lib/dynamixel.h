@@ -13,9 +13,9 @@
  * Dynamixel set angle structure
  */
 typedef struct {
-        uint8_t id;
-        uint16_t angle;
-        uint16_t speed;
+    uint8_t id;
+    uint16_t angle;
+    uint16_t speed;
 }__attribute__((packed)) dyn_set_angle_t;
 
 void dynamixel_init(void *args);

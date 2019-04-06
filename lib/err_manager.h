@@ -5,15 +5,15 @@
 #include "dev_map.h"
 
 #define add_err_flag(flag, n, status) \
-        flag = ((status << n) | (flag & ~(0x1 << n)))
+    flag = ((status << n) | (flag & ~(0x1 << n)))
 
 #define get_err_flag(flag, n) \
-        (((flag) >> (n)) & 0x01)
+    (((flag) >> (n)) & 0x01)
 
 typedef struct {
-        uint8_t col_av_err_flags;
-        uint8_t col_av_dist[NUMBER_OF_PROX_SENSORS];
-        uint8_t disp_update;
+    uint8_t col_av_err_flags;
+    uint8_t col_av_dist[NUMBER_OF_PROX_SENSORS];
+    uint8_t disp_update;
 } err_ctrl_t;
 
 void err_man_init(void);
