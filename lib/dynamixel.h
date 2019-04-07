@@ -18,7 +18,7 @@ typedef struct {
     uint16_t speed;
 }__attribute__((packed)) dyn_set_angle_t;
 
-void dynamixel_init(void *args);
+void dynamixel_init();
 void dyn_set_angle(void *args);
 
 #endif

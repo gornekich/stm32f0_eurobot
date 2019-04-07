@@ -54,9 +54,9 @@
 #define ERROR_MAN_TIM                           TIM3
 #define ERROR_MAN_TIM_MODE                      LL_TIM_COUNTERMODE_UP
 #define ERROR_MAN_TIM_PSC                       47999
-#define ERROR_MAN_TIM_RELOAD                    999
+#define ERROR_MAN_TIM_RELOAD                    99
 #define ERROR_MAN_TIM_IRQN                      TIM3_IRQn
-#define ERROR_MAN_TIM_IRQN_PRIORITY             2
+#define ERROR_MAN_TIM_IRQN_PRIORITY             69
 
 /*
  * Display control

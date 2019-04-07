@@ -6,6 +6,9 @@
 #include "terminal.h"
 #include "err_manager.h"
 #include "coll_avoid.h"
+#include "dynamixel.h"
+
+static int tick = 0;
 
 /**
   * System Clock Configuration
@@ -43,30 +46,54 @@ static void rcc_config(void)
     /* Set APB1 prescaler */
     LL_RCC_SetAPB1Prescaler(LL_RCC_APB1_DIV_1);
 
+    /* Set systick to 1ms */
+    SysTick_Config(48000000/1000);
+
     /* Update CMSIS variable (which can be updated also
      * through SystemCoreClockUpdate function) */
     SystemCoreClock = 48000000;
 }
 
+void SysTick_Handler(void) {
+        tick++;
+        if (tick == 10000) {
+                //LL_GPIO_TogglePin(GPIOC, LL_GPIO_PIN_8);
+                tick = 0;
+        }
+}
+
 int main(void)
 {
     uint8_t col_av_status = 0;
-    uint8_t cur_id = 0;
+    // uint8_t cur_id = 0;
     uint8_t err_man_status;
+    int cur_tick = 0;
+    int time = 0;
 
     rcc_config();
     term_init();
+    dynamixel_init();
     coll_avoid_init();
     err_man_init();
+    
+    // cur_tick = tick;
+    // reset_sensor(0);
+    // time = tick > cur_tick ? tick - cur_tick : 10000 + tick - cur_tick;
+    // err_show_time(time);
     while (1) {
         col_av_status = col_av_read_status();
         if (col_av_status) {
             col_av_set_block();
-            while (col_av_status >> 1 && cur_id++);
-            //reset_sensor(cur_id);
-            col_av_clr_status(cur_id);
+            cur_tick = tick;
+            // reset_sensors();
+            // reset_sensor(cur_id);
+            reload_sensors();
+            time = tick > cur_tick ? tick - cur_tick : 10000 + tick - cur_tick;
+            err_man_set_time(time);
+            // col_av_clr_status(cur_id);
+            col_av_clr_full_status();
             col_av_clr_block();
-            cur_id = 0;
+            // cur_id = 0;
         }
         err_man_status = er_man_disp_get();
         if (err_man_status) {

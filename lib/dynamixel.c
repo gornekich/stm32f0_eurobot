@@ -56,7 +56,7 @@ static void dyn_set_speed(uint8_t id, uint16_t speed)
 static void dyn_disable_torque(void)
 {
     static const uint8_t DYN_DISABLE_TORQUE_CMD_LEN = 8;
-    uint8_t crc = (0xfe + 0x04 + 0x03 + 0x18 + 0x00) % 0xff;
+    uint8_t crc = 0xfe + 0x04 + 0x03 + 0x18 + 0x00;
     uint8_t tx[] = {0xff, 0xff, 0xfe, 0x04, 0x03, 0x18, 0x00,
                             ~crc};
     dyn_send_cmd(tx, DYN_DISABLE_TORQUE_CMD_LEN);
@@ -67,11 +67,8 @@ static void dyn_disable_torque(void)
 /*
  * Public commands implementation
  */
-void dynamixel_init(void *args)
+void dynamixel_init()
 {
-    (void) args;
-    //int i = 0;
-
     /*
      * Initialization code
      * Setting USART pin
@@ -98,10 +95,10 @@ void dynamixel_init(void *args)
     LL_USART_SetBaudRate(DYNAMIXEL_USART, SystemCoreClock,
                          DYNAMIXEL_USART_OVERSAMPL,
                          DYNAMIXEL_USART_BAUDRATE);
-    LL_USART_EnableDMAReq_RX(DYNAMIXEL_USART);
     LL_USART_EnableHalfDuplex(DYNAMIXEL_USART);
     LL_USART_DisableDirectionTx(DYNAMIXEL_USART);
     LL_USART_EnableDirectionRx(DYNAMIXEL_USART);
+    LL_USART_Enable(DYNAMIXEL_USART);
     /*
      * Configure debug led
      */

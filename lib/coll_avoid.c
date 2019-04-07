@@ -15,6 +15,7 @@
 #include "terminal.h"
 #include "err_manager.h"
 #include "display.h"
+#include <string.h>
 
 #define MIN(a,b) (((a)<(b))?(a):(b))
 
@@ -32,7 +33,7 @@ static void tim_init(void)
      */
     LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_TIM2);
     LL_TIM_SetPrescaler(TIM2, 47999);
-    LL_TIM_SetAutoReload(TIM2, 99);
+    LL_TIM_SetAutoReload(TIM2, 9);
     LL_TIM_SetCounterMode(TIM2, LL_TIM_COUNTERMODE_UP);
     LL_TIM_EnableIT_UPDATE(TIM2);
     LL_TIM_EnableCounter(TIM2);
@@ -40,7 +41,62 @@ static void tim_init(void)
      * Setup NVIC
      */
     NVIC_EnableIRQ(TIM2_IRQn);
-    NVIC_SetPriority(TIM2_IRQn, 4);
+    NVIC_SetPriority(TIM2_IRQn, 69);
+    return;
+}
+
+/*
+ * Public function
+ */
+void init_sensors(void)
+{
+    VL53L0X_Error status;
+
+    VL53L0X_hw_config(&xshut_pin);
+    /*
+     * Iterate over all collision avoidance service structures
+     * initial value = col_avoid_ctrl
+     * current struct = ca_ctrl
+     * implicit variable to be used for iterations is i
+     */
+    FOREACH_CA_CTRL(col_avoid_ctrl, ca_ctrl)
+        /*
+         * Turn on the sensor
+         */
+        LL_GPIO_SetOutputPin(xshut_pin[i].port, xshut_pin[i].pin);
+        /*
+         * Save params for interrupt pin
+         */
+        VL53L0X_PollingDelay(&GET_DEV(ca_ctrl));
+        /*
+         * Assign default address and do init procedure
+         */
+        GET_DEV(ca_ctrl).I2cDevAddr = CA_DEF_ADDR;
+        status = VL53L0X_DataInit(&GET_DEV(ca_ctrl));
+        if (status != VL53L0X_ERROR_NONE) {
+            continue;
+        }
+        VL53L0X_StaticInit(&GET_DEV(ca_ctrl));
+        VL53L0X_PerformRefCalibration(&GET_DEV(ca_ctrl),
+            &ca_ctrl->vhv_settings,
+            &ca_ctrl->phase_cal);
+        VL53L0X_PerformRefSpadManagement(&GET_DEV(ca_ctrl),
+            &ca_ctrl->ref_spad_count,
+            &ca_ctrl->is_aperture_spads);
+        VL53L0X_SetDeviceMode(&GET_DEV(ca_ctrl),
+            VL53L0X_DEVICEMODE_CONTINUOUS_RANGING);
+        /*
+         * Now change default address of sensor and
+         * distance between two neighbouring sensors is
+         * CA_ADDR_DIST
+         */
+        VL53L0X_SetDeviceAddress(&GET_DEV(ca_ctrl), i * CA_ADDR_DIST);
+        GET_DEV(ca_ctrl).I2cDevAddr = i * CA_ADDR_DIST;
+        /*
+         * Start measurement
+         */
+        VL53L0X_StartMeasurement(&GET_DEV(ca_ctrl));
+    FOREACH_CA_CTRL_END(ca_ctrl)
     return;
 }
 
@@ -51,7 +107,13 @@ void reset_sensors(void)
 {
     VL53L0X_Error status;
 
-    VL53L0X_hw_config(&xshut_pin);
+    /*
+     * Turn off all sensors
+     */
+    for (int i = 0; i < NUMBER_OF_PROX_SENSORS; i++) {
+        LL_GPIO_ResetOutputPin(xshut_pin[i].port, xshut_pin[i].pin);
+    }
+    VL53L0X_PollingDelay(&GET_DEV_ID(0));
     /*
      * Iterate over all collision avoidance service structures
      * initial value = col_avoid_ctrl
@@ -107,7 +169,7 @@ void reset_sensor(uint8_t id)
      * Turn on the sensor
      */
     LL_GPIO_ResetOutputPin(xshut_pin[id].port, xshut_pin[id].pin);
-    VL53L0X_PollingDelay(&GET_DEV(ca_ctrl));
+    VL53L0X_PollingDelay(&GET_DEV_ID(id));
     LL_GPIO_SetOutputPin(xshut_pin[id].port, xshut_pin[id].pin);
     VL53L0X_PollingDelay(&GET_DEV_ID(id));
     /*
@@ -147,8 +209,34 @@ void reset_sensor(uint8_t id)
 void coll_avoid_init(void)
 {
     col_av_data.status = 0x00;
+    col_av_data.broken_num = 0;
+    for (int i = 0; i < NUMBER_OF_PROX_SENSORS; i++) {
+        col_av_data.sns_status[i] = 0;
+    }
+    //memset(col_av_data, 0, NUMBER_OF_PROX_SENSORS);
+    init_sensors();
     tim_init();
-    reset_sensors();
+    return;
+}
+
+void reload_sensors(void)
+{
+    if (col_av_data.broken_num == 1) {
+        for (int i = 0; i < NUMBER_OF_PROX_SENSORS; i++) {
+            if (col_av_data.sns_status[i] == 1) {
+                reset_sensor(i);
+                col_av_data.sns_status[i] = 0;
+                col_av_data.broken_num = 0;
+            }
+        }
+    }
+    else {
+        reset_sensors();
+        for (int i = 0; i < NUMBER_OF_PROX_SENSORS; i++) {
+            col_av_data.sns_status[i] = 0;
+        }
+        col_av_data.broken_num = 0;
+    }
     return;
 }
 
@@ -170,6 +258,12 @@ void col_av_clr_status(uint8_t id)
 uint8_t col_av_get_status(uint8_t id)
 {
     return (col_av_data.status >> id) & 0x01;
+}
+
+void col_av_clr_full_status(void)
+{
+    col_av_data.status = 0;
+    return;
 }
 
 void col_av_set_block(void)
@@ -226,16 +320,17 @@ void TIM2_IRQHandler(void)
 
     if (!col_av_data.block) {
         col_av_data.dist[current_id] = get_dist(current_id);
-        if (col_av_data.dist[current_id] == 255)
-            col_av_set_status(current_id);
+        if (col_av_data.dist[current_id] == 255){
+            col_av_data.sns_status[current_id] = 1;
+            col_av_data.broken_num++;
+        }
         if (current_id == (NUMBER_OF_PROX_SENSORS - 1)) {
+            if (col_av_data.broken_num) {
+                col_av_data.status = col_av_data.broken_num;
+            }
             err_man_set_dist(col_av_data.dist, NUMBER_OF_PROX_SENSORS);
-            //err_man_show_err();
-            //disp_fill(BLACK);
-            // disp_set_cursor(1, 1);
-            // xprintf("%d:%d", current_id, col_av_data.dist[current_id]);
-            // disp_update();
-            // comm_send_msg(col_av_data.dist, NUMBER_OF_PROX_SENSORS);
+            er_man_add_err(col_av_data.sns_status, col_av_data.broken_num);
+            comm_send_msg(col_av_data.dist, NUMBER_OF_PROX_SENSORS);
         }
         current_id = (current_id + 1) % NUMBER_OF_PROX_SENSORS;
     }

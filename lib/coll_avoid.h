@@ -7,6 +7,8 @@
 
 typedef struct {
     uint8_t dist[NUMBER_OF_PROX_SENSORS];
+    uint8_t sns_status[NUMBER_OF_PROX_SENSORS];
+    uint8_t broken_num;
     uint8_t status;
     uint8_t block;
 } col_av_data_t;
@@ -44,14 +46,17 @@ typedef struct {
 /*
  * Public functions
  */
+void init_sensors(void);
 void reset_sensors(void);
 void reset_sensor(uint8_t id);
+void reload_sensors(void);
 void coll_avoid_init(void);
 
 uint8_t col_av_read_status(void);
 void col_av_set_status(uint8_t id);
 void col_av_clr_status(uint8_t id);
 uint8_t col_av_get_status(uint8_t id);
+void col_av_clr_full_status(void);
 
 uint8_t col_av_get_block(void);
 void col_av_clr_block(void);

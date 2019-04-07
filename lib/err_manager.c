@@ -33,13 +33,11 @@ static void tim_init(void)
     return;
 }
 
-/*
- * Private function for displaying errors
- */
 void err_man_show_err(void)
 {
     int i = 0;
 
+    disp_fill(BLACK);
     for (i = 0; i < NUMBER_OF_PROX_SENSORS; i++) {
         disp_set_cursor((i % 2) * 7, i >> 1);
         if (err_ctrl.col_av_dist[i] == 255){
@@ -49,8 +47,23 @@ void err_man_show_err(void)
             xprintf("%d:%d", i, err_ctrl.col_av_dist[i]);
         }
     }
+    disp_set_cursor(0, 3);
+    xprintf("#sns br %d: ", err_ctrl.broken_num);
+    for (int i = 0; i < NUMBER_OF_PROX_SENSORS; i++) {
+        if (err_ctrl.col_av_status[i] == 1)
+            xprintf("%d ", i);
+    }
+    disp_set_cursor(0, 4);
+    xprintf("total reloads: %d", err_ctrl.col_av_err_num);
+    disp_set_cursor(0, 5);
+    xprintf("reload time:%d", err_ctrl.reset_time);
     disp_update();
     return;
+}
+
+void err_man_set_time(int time)
+{
+    err_ctrl.reset_time = time;
 }
 
 /*
@@ -58,10 +71,7 @@ void err_man_show_err(void)
  */
 void err_man_set_dist(uint8_t *dist, uint8_t len)
 {
-    for (int i = 0; i < len; ++i) {
-        err_ctrl.col_av_dist[i] = dist[i];
-    }
-    //memcpy(err_ctrl.col_av_dist, dist, len);
+    memcpy(err_ctrl.col_av_dist, dist, len);
     return;
 }
 
@@ -70,10 +80,12 @@ void err_man_set_dist(uint8_t *dist, uint8_t len)
  */
 void err_man_init(void)
 {
-    err_ctrl.col_av_err_flags = 0x00;
+    err_ctrl.col_av_err_num = 0;
+    err_ctrl.disp_update = 0;
+    err_ctrl.reset_time = 0;
+    err_ctrl.reset_id = 0;
     disp_init();
     tim_init();
-    err_man_show_err();
 }
 
 uint8_t er_man_disp_get(void)
@@ -90,6 +102,15 @@ void er_man_disp_set(void)
 void er_man_disp_clr(void)
 {
     err_ctrl.disp_update = 0;
+    return;
+}
+
+void er_man_add_err(uint8_t *status, uint8_t broken)
+{
+    memcpy(err_ctrl.col_av_status, status, NUMBER_OF_PROX_SENSORS);
+    err_ctrl.broken_num = broken;
+    if (broken)
+        err_ctrl.col_av_err_num++;
     return;
 }
 
