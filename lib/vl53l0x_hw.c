@@ -16,6 +16,12 @@
  */
 static const out_t xshut_config[] = COL_AV_XSHUT_CONFIG;
 
+void VL53L0X_hw_reset()
+{
+    LL_I2C_Disable(COL_AV_I2C);
+    LL_I2C_Enable(COL_AV_I2C);
+}
+
 void VL53L0X_hw_config(const out_t **xshut_pin) {
     uint16_t i;
     /*
@@ -56,7 +62,6 @@ void VL53L0X_hw_config(const out_t **xshut_pin) {
      * Clock on the I2C peripheral and set it up
      */
     LL_RCC_SetI2CClockSource(LL_RCC_I2C1_CLKSOURCE_SYSCLK);
-    LL_I2C_Disable(COL_AV_I2C);
     LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_I2C1);
     LL_I2C_DisableAnalogFilter(COL_AV_I2C);
     LL_I2C_SetDigitalFilter(COL_AV_I2C, 1);

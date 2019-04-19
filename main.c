@@ -55,48 +55,48 @@ static void rcc_config(void)
 }
 
 void SysTick_Handler(void) {
-        tick++;
-        if (tick == 10000) {
-                //LL_GPIO_TogglePin(GPIOC, LL_GPIO_PIN_8);
-                tick = 0;
-        }
+    tick = (tick + 1) % 10000;
 }
 
 int main(void)
 {
-    uint8_t col_av_status = 0;
     // uint8_t cur_id = 0;
-    uint8_t err_man_status;
     int cur_tick = 0;
+    int new_tick = 0;
     int time = 0;
+    int step = 0;
 
     rcc_config();
     term_init();
     dynamixel_init();
     coll_avoid_init();
     err_man_init();
-    
-    // cur_tick = tick;
-    // reset_sensor(0);
-    // time = tick > cur_tick ? tick - cur_tick : 10000 + tick - cur_tick;
-    // err_show_time(time);
+
+    /*
+     * On every INTERRESET_TIME iteration check if it is possible
+     * to reload all sensors if there is an error
+     * The introduction if INTERRESET_TIME is requied to decrease
+     * the number of blocks of timer handler thus allowing non-faulty
+     * sensors to work
+     */
     while (1) {
-        col_av_status = col_av_read_status();
-        if (col_av_status) {
+        if (col_av_read_status()) {
+            step = (step + 1) % INTERRESET_TIME;
+            if (step)// && !col_av_blackout())
+                continue;
+            step = 0;
             col_av_set_block();
+            while (!col_av_get_ack_block());
             cur_tick = tick;
-            // reset_sensors();
-            // reset_sensor(cur_id);
             reload_sensors();
-            time = tick > cur_tick ? tick - cur_tick : 10000 + tick - cur_tick;
+            new_tick = tick;
+            time = new_tick >= cur_tick ? new_tick - cur_tick :
+                                         10000 + new_tick - cur_tick;
             err_man_set_time(time);
-            // col_av_clr_status(cur_id);
-            col_av_clr_full_status();
+            col_av_set_status(col_av_any());
             col_av_clr_block();
-            // cur_id = 0;
         }
-        err_man_status = er_man_disp_get();
-        if (err_man_status) {
+        if (er_man_disp_get()) {
             err_man_show_err();
             er_man_disp_clr();
         }
