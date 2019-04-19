@@ -38,7 +38,7 @@
  */
 #define DYNAMIXEL_USART                         USART1
 #define DYNAMIXEL_USART_IRQN                    USART1_IRQn
-#define DYNAMIXEL_USART_IRQN_PRIORITY           1
+#define DYNAMIXEL_USART_IRQN_PRIORITY           0
 #define DYNAMIXEL_USART_PERIPH_PRESCALER        2
 #define DYNAMIXEL_USART_BAUDRATE                1000000
 #define DYNAMIXEL_USART_DATA_WIDTH              LL_USART_DATAWIDTH_8B

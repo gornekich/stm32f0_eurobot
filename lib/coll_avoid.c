@@ -192,16 +192,10 @@ void coll_avoid_init(void)
 void reload_sensors(void)
 {
     int i;
-    VL53L0X_DeviceError err;
 
     for (i = 0; i < NUMBER_OF_PROX_SENSORS; i++) {
-        if (!col_av_data.sns_status[i]) {
-            //VL53L0X_GetDeviceErrorStatus(&GET_DEV_ID(i), &err);
-            //if (err == VL53L0X_DEVICEERROR_NONE ||
-            //    err == VL53L0X_DEVICEERROR_RANGECOMPLETE)
+        if (!col_av_data.sns_status[i])
                 continue;
-            //col_av_data.sns_status[i] = 1;
-        }
         if (reset_sensor(i) != VL53L0X_ERROR_NONE)
             continue;
         col_av_data.sns_status[i] = 0;
