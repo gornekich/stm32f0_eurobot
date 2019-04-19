@@ -11,6 +11,7 @@ typedef struct {
     uint8_t broken_num;
     uint8_t status;
     uint8_t block;
+    uint8_t ack_block;
 } col_av_data_t;
 
 typedef struct {
@@ -41,14 +42,22 @@ typedef struct {
     (void) ca_ctrl;
 
 #define CA_DEF_ADDR 0x52
-#define CA_ADDR_DIST 0x5
+#define CA_ADDR_DIST 0x2
+#define INTERRESET_TIME 1000
+#define SNS_TRIGGER_TRSH 1
+
+/*
+ * Define the numbers of high priority sensors to avoid
+ * waiting in reload procedure
+ */
+#define IMPORTANT_SNS {0,1,2}
 
 /*
  * Public functions
  */
 void init_sensors(void);
 void reset_sensors(void);
-void reset_sensor(uint8_t id);
+VL53L0X_Error reset_sensor(uint8_t id);
 void reload_sensors(void);
 void coll_avoid_init(void);
 
@@ -62,4 +71,9 @@ uint8_t col_av_get_block(void);
 void col_av_clr_block(void);
 void col_av_set_block(void);
 
+uint8_t col_av_get_ack_block(void);
+
+uint8_t col_av_blackout(void);
+
+uint8_t col_av_any(void);
 #endif

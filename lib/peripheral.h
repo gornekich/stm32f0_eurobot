@@ -76,6 +76,6 @@
 #define COL_AV_I2C                              I2C1
 #define COL_AV_I2C_ADDR_MODE                    LL_I2C_ADDRESSING_MODE_7BIT
 #define COL_AV_I2C_MODE                         LL_I2C_MODE_I2C
-#define COL_AV_I2C_TIMING                       0xB0420F13
+#define COL_AV_I2C_TIMING                       0x50330309//0xB0420F13
 
 #endif //_PERIPHERIAL_H
