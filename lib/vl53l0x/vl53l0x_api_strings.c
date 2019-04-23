@@ -56,9 +56,9 @@ VL53L0X_Error VL53L0X_check_part_used(VL53L0X_DEV Dev,
         strcpy(pVL53L0X_DeviceInfo->ProductId, "");
     } else {
         *Revision = VL53L0X_GETDEVICESPECIFICPARAMETER(Dev, Revision);
-        ProductId_tmp = VL53L0X_GETDEVICESPECIFICPARAMETER(Dev,
-            ProductId);
-        strcpy(pVL53L0X_DeviceInfo->ProductId, ProductId_tmp);
+        //ProductId_tmp = VL53L0X_GETDEVICESPECIFICPARAMETER(Dev,
+        //    ProductId);
+        //strcpy(pVL53L0X_DeviceInfo->ProductId, ProductId_tmp);
     }
     }
 
