@@ -12,6 +12,7 @@ typedef struct {
     uint8_t status;
     uint8_t block;
     uint8_t ack_block;
+    uint8_t laser_check[NUMBER_OF_PROX_SENSORS];
 } col_av_data_t;
 
 typedef struct {
@@ -43,8 +44,10 @@ typedef struct {
 
 #define CA_DEF_ADDR 0x52
 #define CA_ADDR_DIST 0x2
+#define CA_ADDR_OFS 0x10
 #define INTERRESET_TIME 1000
 #define SNS_TRIGGER_TRSH 1
+#define LASER_CHECK_TRSH 10
 
 /*
  * Define the numbers of high priority sensors to avoid
@@ -76,4 +79,5 @@ uint8_t col_av_get_ack_block(void);
 uint8_t col_av_blackout(void);
 
 uint8_t col_av_any(void);
+
 #endif
