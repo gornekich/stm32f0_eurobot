@@ -106,11 +106,8 @@ void DMA1_Channel4_5_IRQHandler(void)
     NVIC_DisableIRQ(TIM3_IRQn);
     if (LL_DMA_IsActiveFlag_TC5(TERM_DMA)) {
         LL_DMA_ClearFlag_TC5(TERM_DMA);
-        LL_DMA_ClearFlag_HT5(TERM_DMA);
-        LL_DMA_EnableChannel(TERM_DMA, TERM_DMA_CHANNEL);
-        memcpy(term_ctrl.params, &term_ctrl.channel[1],
-                   TERM_CMD_LENGTH - 1);
-        dyn_set_angle((void *)term_ctrl.params);
+        memcpy(term_ctrl.params, term_ctrl.channel, TERM_CMD_LENGTH);
+        dyn_manager((void *)term_ctrl.params);
     }
     NVIC_EnableIRQ(TIM2_IRQn);
     NVIC_EnableIRQ(TIM3_IRQn);    

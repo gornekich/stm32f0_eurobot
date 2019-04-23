@@ -60,6 +60,9 @@ typedef struct {
     {GPIOC, LL_GPIO_PIN_3}, /* ID3 */ \
     {GPIOB, LL_GPIO_PIN_10}, /* ID4 */ \
     {GPIOB, LL_GPIO_PIN_11}, /* ID5 */ \
+    {GPIOB, LL_GPIO_PIN_12}, /* ID6 */ \
+    {GPIOC, LL_GPIO_PIN_7}, /* ID7 */ \
+    {GPIOC, LL_GPIO_PIN_8}, /* ID8 */ \
 }
 
 #define COL_AV_I2C_PORT                     GPIOB

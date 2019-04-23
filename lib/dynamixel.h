@@ -16,9 +16,9 @@ typedef struct {
     uint8_t id;
     uint16_t angle;
     uint16_t speed;
-}__attribute__((packed)) dyn_set_angle_t;
+}__attribute__((packed)) dyn_ctrl_t;
 
 void dynamixel_init();
-void dyn_set_angle(void *args);
+void dyn_manager(void *args);
 
 #endif
