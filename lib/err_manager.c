@@ -47,14 +47,14 @@ void err_man_show_err(void)
             xprintf("%d:%d", i, err_ctrl.col_av_dist[i]);
         }
     }
-    disp_set_cursor(0, 3);
-    xprintf("#sns br %d: ", err_ctrl.broken_num);
-    for (int i = 0; i < NUMBER_OF_PROX_SENSORS; i++) {
-        if (err_ctrl.col_av_status[i] == 1)
-            xprintf("%d ", i);
-    }
-    disp_set_cursor(0, 4);
-    xprintf("tot reloads: %d", err_ctrl.col_av_err_num);
+    // disp_set_cursor(0, 3);
+    // xprintf("#sns br %d: ", err_ctrl.broken_num);
+    // for (int i = 0; i < NUMBER_OF_PROX_SENSORS; i++) {
+    //     if (err_ctrl.col_av_status[i] == 1)
+    //         xprintf("%d ", i);
+    // }
+    // disp_set_cursor(0, 4);
+    // xprintf("tot reloads: %d", err_ctrl.col_av_err_num);
     disp_set_cursor(0, 5);
     xprintf("reload time:%d", err_ctrl.reset_time);
     disp_update();

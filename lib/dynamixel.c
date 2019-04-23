@@ -116,19 +116,18 @@ static void dyn_set_speed(uint8_t *speeds)
 static void dyn_disable_torque(void)
 {
     // TODO change on reset pin for new board
-    static const uint8_t DYN_DISABLE_TORQUE_CMD_LEN = 8;
-    uint8_t crc = 0xfe + 0x04 + 0x03 + 0x18 + 0x00;
-    uint8_t tx[] = {0xff, 0xff, 0xfe, 0x04, 0x03, 0x18, 0x00,
-                            ~crc};
-    dyn_send_cmd(tx, DYN_DISABLE_TORQUE_CMD_LEN);
-    dyn_delay(48000000/1000);
+    // static const uint8_t DYN_DISABLE_TORQUE_CMD_LEN = 8;
+    // uint8_t crc = 0xfe + 0x04 + 0x03 + 0x18 + 0x00;
+    // uint8_t tx[] = {0xff, 0xff, 0xfe, 0x04, 0x03, 0x18, 0x00,
+    //                         ~crc};
+    // dyn_send_cmd(tx, DYN_DISABLE_TORQUE_CMD_LEN);
+    // dyn_delay(48000000/1000);
 
     /*
      * Reset power supply with thransistor
      */
-
-    // LL_GPIO_ResetOutputPin(DYN_RESET_PORT, DYN_RESET_PIN);
-    // LL_GPIO_TogglePin(GPIOC, LL_GPIO_PIN_8);
+    LL_GPIO_ResetOutputPin(DYN_RESET_PORT, DYN_RESET_PIN);
+    LL_GPIO_TogglePin(GPIOC, LL_GPIO_PIN_8);
 
     return;
 }
