@@ -92,8 +92,9 @@ void init_sensors(void)
          * distance between two neighbouring sensors is
          * CA_ADDR_DIST
          */
-        VL53L0X_SetDeviceAddress(&GET_DEV(ca_ctrl), i * CA_ADDR_DIST);
-        GET_DEV(ca_ctrl).I2cDevAddr = i * CA_ADDR_DIST;
+        VL53L0X_SetDeviceAddress(&GET_DEV(ca_ctrl), i * CA_ADDR_DIST +
+                                 CA_ADDR_OFS);
+        GET_DEV(ca_ctrl).I2cDevAddr = i * CA_ADDR_DIST + CA_ADDR_OFS;
         /*
          * Start measurement
          */
@@ -149,11 +150,12 @@ VL53L0X_Error reset_sensor(uint8_t id)
      * distance between two neighbouring sensors is
      * CA_ADDR_DIST
      */
-    status = VL53L0X_SetDeviceAddress(&GET_DEV_ID(id), id * CA_ADDR_DIST);
+    status = VL53L0X_SetDeviceAddress(&GET_DEV_ID(id), id * CA_ADDR_DIST +
+                                      CA_ADDR_OFS);
     VL53L0X_PollingDelay(&GET_DEV_ID(id));
     if (status != VL53L0X_ERROR_NONE)
         goto err_out;
-    GET_DEV_ID(id).I2cDevAddr = id * CA_ADDR_DIST;
+    GET_DEV_ID(id).I2cDevAddr = id * CA_ADDR_DIST + CA_ADDR_OFS;
     /*
      * Start measurement
      */
@@ -194,12 +196,12 @@ void reload_sensors(void)
     int i;
 
     for (i = 0; i < NUMBER_OF_PROX_SENSORS; i++) {
-        if (!col_av_data.sns_status[i])
-                continue;
+        if (!col_av_data.sns_status[i]) {
+            continue;
+        }
         if (reset_sensor(i) != VL53L0X_ERROR_NONE)
             continue;
         col_av_data.sns_status[i] = 0;
-        col_av_data.broken_num--;
     }
     return;
 }
@@ -291,6 +293,18 @@ static uint8_t get_dist(uint8_t id)
     if (err != VL53L0X_ERROR_NONE) {
         goto err_out;
     }
+    if (RangingMeasurementData.RangeStatus != 0) {
+        col_av_data.laser_check[id] = (col_av_data.laser_check[id] + 1) %
+                                      LASER_CHECK_TRSH;
+        if (!col_av_data.laser_check[id]) {
+            err = VL53L0X_StopMeasurement(&GET_DEV_ID(id));
+            if (err)
+                goto err_out;
+            err = VL53L0X_StartMeasurement(&GET_DEV_ID(id));
+            if (err)
+                goto err_out;
+        }
+    }
     /*
      * Read distance and round it, decrease the number of significant
      * bits and limit max distance to 50 cm
@@ -347,10 +361,12 @@ timer_out:
      * if it is the last sensor then set status for reloader routine
      * and print info on the display
      */
-    if (current_id == (NUMBER_OF_PROX_SENSORS - 1)) {
-        col_av_data.status = (col_av_any());// >= SNS_TRIGGER_TRSH);
-        err_man_set_dist(col_av_data.dist, NUMBER_OF_PROX_SENSORS);
+    col_av_data.status = col_av_any();// >= SNS_TRIGGER_TRSH);
+    if (col_av_data.status)
         er_man_add_err(col_av_data.sns_status, col_av_data.broken_num);
+
+    if (current_id == (NUMBER_OF_PROX_SENSORS - 1)) {
+        err_man_set_dist(col_av_data.dist, NUMBER_OF_PROX_SENSORS);
         comm_send_msg(col_av_data.dist, NUMBER_OF_PROX_SENSORS);
     }
 }
