@@ -425,9 +425,9 @@ VL53L0X_Error VL53L0X_get_info_from_device(VL53L0X_DEV Dev, uint8_t option)
             VL53L0X_SETDEVICESPECIFICPARAMETER(Dev,
                     Revision, Revision);
 
-            ProductId_tmp = VL53L0X_GETDEVICESPECIFICPARAMETER(Dev,
-                    ProductId);
-            strcpy(ProductId_tmp, ProductId);
+            //ProductId_tmp = VL53L0X_GETDEVICESPECIFICPARAMETER(Dev,
+            //        ProductId);
+            //strcpy(ProductId_tmp, ProductId);
 
         }
 

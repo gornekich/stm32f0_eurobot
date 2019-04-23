@@ -410,7 +410,7 @@ typedef struct {
     been done (==1) or not (==0) */
     uint8_t ModuleId; /* Module ID */
     uint8_t Revision; /* test Revision */
-    char ProductId[VL53L0X_MAX_STRING_LENGTH];
+    //char ProductId[VL53L0X_MAX_STRING_LENGTH];
         /* Product Identifier String  */
     uint8_t ReferenceSpadCount; /* used for ref spad management */
     uint8_t ReferenceSpadType;  /* used for ref spad management */
