@@ -106,7 +106,9 @@ void init_sensors(void)
 
 VL53L0X_Error reset_sensor(uint8_t id)
 {
-    __disable_irq();
+    //__disable_irq();
+    NVIC_DisableIRQ(TIM2_IRQn);
+    NVIC_DisableIRQ(ERROR_MAN_TIM_IRQN);
     VL53L0X_Error status;
     /*
      * Reset I2C
@@ -165,12 +167,16 @@ VL53L0X_Error reset_sensor(uint8_t id)
         goto err_out;
 
     VL53L0X_PollingDelay(&GET_DEV_ID(id));
-    __enable_irq();
+    //__enable_irq();
+    NVIC_EnableIRQ(TIM2_IRQn);
+    NVIC_EnableIRQ(ERROR_MAN_TIM_IRQN);
     return status;
 err_out:
     LL_GPIO_ResetOutputPin(xshut_pin[id].port,
                            xshut_pin[id].pin);
-    __enable_irq();
+    //__enable_irq();
+    NVIC_EnableIRQ(TIM2_IRQn);
+    NVIC_EnableIRQ(ERROR_MAN_TIM_IRQN);
     return status;
 }
 
