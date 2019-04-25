@@ -53,10 +53,10 @@ void err_man_show_err(void)
     //     if (err_ctrl.col_av_status[i] == 1)
     //         xprintf("%d ", i);
     // }
-    // disp_set_cursor(0, 4);
-    // xprintf("tot reloads: %d", err_ctrl.col_av_err_num);
     disp_set_cursor(0, 5);
-    xprintf("reload time:%d", err_ctrl.reset_time);
+    xprintf("tot reloads: %d", err_ctrl.col_av_err_num);
+    // disp_set_cursor(0, 5);
+    // xprintf("reload time:%d", err_ctrl.reset_time);
     disp_update();
     return;
 }

@@ -11,6 +11,7 @@
 #include "vl53l0x_api.h"
 #include "vl53l0x_hw.h"
 #include "gpio_map.h"
+#include "peripheral.h"
 #include "xprintf.h"
 #include "terminal.h"
 #include "err_manager.h"
