@@ -126,6 +126,13 @@ void disp_update(void)
 {
     uint8_t i = 0;
 
+    // Set addressing mode
+    // Vertical addressing mode
+    disp_send_cmd(0x20);
+    disp_send_cmd(0x10);
+    // Set display offset: 0-63
+    disp_send_cmd(0xD3);
+    disp_send_cmd(0x00);
     for (i = 0; i < 8; i++)
     {
         disp_send_cmd(0xB7 + i);

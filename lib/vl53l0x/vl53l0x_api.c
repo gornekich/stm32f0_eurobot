@@ -311,12 +311,12 @@ VL53L0X_Error VL53L0X_DataInit(VL53L0X_DEV Dev)
 
     /* by default the I2C is running at 1V8 if you want to change it you
      * need to include this define at compilation level. */
-#ifdef USE_I2C_2V8
+// #ifdef USE_I2C_2V8
     Status = VL53L0X_UpdateByte(Dev,
         VL53L0X_REG_VHV_CONFIG_PAD_SCL_SDA__EXTSUP_HV,
         0xFE,
         0x01);
-#endif
+// #endif
 
     /* Set I2C standard mode */
     if (Status == VL53L0X_ERROR_NONE)

@@ -82,10 +82,9 @@ void init_sensors(void)
         VL53L0X_PerformRefCalibration(&GET_DEV(ca_ctrl),
             &ca_ctrl->vhv_settings,
             &ca_ctrl->phase_cal);
-        /*VL53L0X_PerformRefSpadManagement(&GET_DEV(ca_ctrl),
+        VL53L0X_PerformRefSpadManagement(&GET_DEV(ca_ctrl),
             &ca_ctrl->ref_spad_count,
             &ca_ctrl->is_aperture_spads);
-        */
         VL53L0X_SetDeviceMode(&GET_DEV(ca_ctrl),
             VL53L0X_DEVICEMODE_CONTINUOUS_RANGING);
         /*
@@ -319,8 +318,7 @@ static uint8_t get_dist(uint8_t id)
     cm = RangingMeasurementData.RangeMilliMeter / 10;
     if (RangingMeasurementData.RangeMilliMeter % 10 >= 5)
         cm += 1;
-    cm = cm >> 1;
-    return MIN(cm * 2, 50);
+    return MIN(cm, 50);
 err_out:
     LL_GPIO_ResetOutputPin(xshut_pin[id].port,
                            xshut_pin[id].pin);
