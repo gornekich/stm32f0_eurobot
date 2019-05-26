@@ -16,7 +16,7 @@
 static void dyn_send_cmd(uint8_t *buff, int len)
 {
     int i = 0;
-
+    __disable_irq();
     LL_USART_DisableDirectionRx(DYNAMIXEL_USART);
     LL_USART_EnableDirectionTx(DYNAMIXEL_USART);
     LL_USART_ClearFlag_TC(DYNAMIXEL_USART);
@@ -27,6 +27,7 @@ static void dyn_send_cmd(uint8_t *buff, int len)
     while (!LL_USART_IsActiveFlag_TC(DYNAMIXEL_USART));
     LL_USART_DisableDirectionTx(DYNAMIXEL_USART);
     LL_USART_EnableDirectionRx(DYNAMIXEL_USART);
+    __enable_irq();
     return;
 }
 
