@@ -126,6 +126,7 @@ void disp_update(void)
 {
     uint8_t i = 0;
 
+    // disp_send_cmd(0xAE); // turn off display
     // Set addressing mode
     // Vertical addressing mode
     disp_send_cmd(0x20);
@@ -133,11 +134,12 @@ void disp_update(void)
     // Set display offset: 0-63
     disp_send_cmd(0xD3);
     disp_send_cmd(0x00);
+    // disp_send_cmd(0xAF); // turn on display
     for (i = 0; i < 8; i++)
     {
-        disp_send_cmd(0xB7 + i);
-        disp_send_cmd(0x0f);
-        disp_send_cmd(0x1f);
+        disp_send_cmd(0xB0 + i);
+        disp_send_cmd(0x00);
+        disp_send_cmd(0x10);
         disp_send_data(&disp_buff[DISP_WIDTH * i], DISP_WIDTH);
     }
     return;
@@ -222,22 +224,56 @@ void disp_init(void)
     /*
      * Setup display
      */
-    disp_send_cmd(0xAE); // turn off display
-    disp_send_cmd(0x20); // set memory addressing mode
-    disp_send_cmd(0x10); // set page addressing mode
-    disp_send_cmd(0x00); // set lower column
-    disp_send_cmd(0x1f); // set higher column
-    disp_send_cmd(0xB0); // set page start
-    disp_send_cmd(0x40); // set display start line
-    disp_send_cmd(0xD3); // set display offset
-    disp_send_cmd(0x00); // display offset zero
-    disp_send_cmd(0x8D); // set DC-DC
-    disp_send_cmd(0x14); // DC-DC enable
-    disp_send_cmd(0x81); // set contrast
-    disp_send_cmd(0xff); // set maximum contrast
-    disp_send_cmd(0xA4); // set output follows RAM content
-    disp_send_cmd(0xA6); // set normal display
-    disp_send_cmd(0xAF); // turn on display
+    // Set display OFF
+    disp_send_cmd(0xAE);
+
+    // Set addressing mode
+    // Vertical addressing mode
+    disp_send_cmd(0x20);
+    disp_send_cmd(0x10);
+
+    // Vertical flip: 0xC0 - on, 0xC8 - off
+    disp_send_cmd(0xC8);
+
+    // Set start line address 0-63
+    disp_send_cmd(0x40);
+
+    // Set contrast level: 0-255
+    disp_send_cmd(0x81);
+    disp_send_cmd(0xFF);
+
+    // Horizontal flip: 0xA1 - on, 0xA0 - off
+    disp_send_cmd(0xA1);
+
+    // Normal colo - 0xA6, Inverse - 0xA7
+    disp_send_cmd(0xA6);
+
+    // Number of active lines: 16 - 64
+    disp_send_cmd(0xA8);
+    disp_send_cmd(0x3F);
+
+    // Render GRAM: 0xA4 - render, 0xA5 - black screen
+    disp_send_cmd(0xA4);
+
+    // Set display offset: 0-63
+    disp_send_cmd(0xD3);
+    disp_send_cmd(0x00);
+
+    // Set display refresh rate:
+    // 7-4 bits set osc freq, 0-3 sets resfresh ratio
+    disp_send_cmd(0xD5);
+    disp_send_cmd(0xF0);
+
+    // Set flipping config
+    disp_send_cmd(0xDA);
+    disp_send_cmd(0x12);
+
+    // Enable charge pump
+    disp_send_cmd(0x8D);
+    disp_send_cmd(0x14);
+
+    // Turn on display
+    disp_send_cmd(0xAF);
     /*
      * Clear screen
      */

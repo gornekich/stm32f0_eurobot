@@ -50,7 +50,6 @@ static void dyn_set_angle(uint8_t id, uint16_t angle)
                            highByte, ~crc};
     if (angle > DYN_MAX_ANGLE)
         return;
-    LL_GPIO_TogglePin(GPIOC, LL_GPIO_PIN_9);
     dyn_send_cmd(tx, DYN_SET_ANGLE_CMD_LEN);
     return;
 }
@@ -67,7 +66,6 @@ static void dyn_set_init_pos(uint8_t *angles)
         uint8_t crc = (i + 1) + 0x05 + 0x03 + 0x1e + lowByte + highByte;
         uint8_t tx[] = {0xff, 0xff, i + 1, 0x05, 0x03, 0x1e, lowByte,
                                highByte, ~crc};
-        LL_GPIO_TogglePin(GPIOC, LL_GPIO_PIN_9);
         dyn_send_cmd(tx, DYN_SET_ANGLE_CMD_LEN);
         dyn_delay(48000000/1000);
     }
@@ -128,8 +126,6 @@ static void dyn_disable_torque(void)
      * Reset power supply with thransistor
      */
     LL_GPIO_ResetOutputPin(DYN_RESET_PORT, DYN_RESET_PIN);
-    LL_GPIO_TogglePin(GPIOC, LL_GPIO_PIN_8);
-
     return;
 }
 
@@ -176,14 +172,6 @@ void dynamixel_init()
     LL_GPIO_SetPinOutputType(DYN_RESET_PORT, DYN_RESET_PIN,
                              LL_GPIO_OUTPUT_PUSHPULL);
     LL_GPIO_SetOutputPin(DYN_RESET_PORT, DYN_RESET_PIN);
-    /*
-     * Configure debug led
-     */
-    LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_GPIOC);
-    LL_GPIO_SetPinMode(GPIOC, LL_GPIO_PIN_9, LL_GPIO_MODE_OUTPUT);
-    LL_GPIO_SetPinMode(GPIOC, LL_GPIO_PIN_8, LL_GPIO_MODE_OUTPUT);
-    LL_GPIO_SetPinOutputType(GPIOC, LL_GPIO_PIN_9, LL_GPIO_OUTPUT_PUSHPULL);
-    LL_GPIO_SetPinOutputType(GPIOC, LL_GPIO_PIN_8, LL_GPIO_OUTPUT_PUSHPULL);
     return;
 }
 
